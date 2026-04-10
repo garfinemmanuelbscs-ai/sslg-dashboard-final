@@ -10,8 +10,24 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 SECRET_KEY = os.environ.get("SECRET_KEY", 'django-insecure-%-g(0l+axl!@7#7fuvos)e)6tc7_u5-gc5o5r+sk&=@+q51ay0')
 
-# Combined ALLOWED_HOSTS
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = [
+    '.onrender.com', 
+    'akagami012-sslg-attendance-system.hf.space', # Your direct link
+    'huggingface.co', 
+    'localhost', 
+    '127.0.0.1', 
+    '*'
+]
+
+# CRITICAL: This fixes the 403 Forbidden error
+CSRF_TRUSTED_ORIGINS = [
+    'https://akagami012-sslg-attendance-system.hf.space',
+    'https://*.hf.space'
+]
+
+# This tells Django that Hugging Face is handling the HTTPS connection
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # --- APPS ---
 INSTALLED_APPS = [
