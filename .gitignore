@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+.env
+
+# AI Models
+.deepface/
+
+# Ignore local uploads
+profiles/
+media/
+*.jpg
+*.png
+*.jpeg

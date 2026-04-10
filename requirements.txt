@@ -1,0 +1,23 @@
+asgiref==3.11.1
+Django==5.2.11
+gunicorn==25.1.0
+packaging==26.0
+sqlparse==0.5.5
+tzdata==2025.3
+whitenoise==6.11.0
+django-cloudinary-storage
+cloudinary
+
+# DEPLOYMENT HELPERS
+dj-database-url
+scipy
+
+# AI & FACE RECOGNITION
+deepface
+tf-keras
+# Use 'opencv-python-headless' for servers like Render to save space
+opencv-python-headless==4.9.0.80
+tensorflow==2.15.0
+keras==2.15.0
+numpy==1.26.4
+pillow
