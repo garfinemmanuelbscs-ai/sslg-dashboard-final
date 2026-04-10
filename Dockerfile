@@ -22,4 +22,4 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # 7. Start the server using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:7860", "sslg_dashboard.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:7860", "studentgov.wsgi:application"]
