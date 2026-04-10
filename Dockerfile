@@ -22,4 +22,5 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # 7. Start the server using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:7860", "studentgov.wsgi:application"]
+# This command runs migrations, then starts Gunicorn
+CMD python manage.py migrate && gunicorn --bind 0.0.0.0:7860 studentgov.wsgi:application
