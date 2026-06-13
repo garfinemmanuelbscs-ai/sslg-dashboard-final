@@ -15,3 +15,9 @@ class Event(models.Model):
     class Meta:
         verbose_name = "Event"
         verbose_name_plural = "Events"
+        # 🟢 Explicit preservation of all 4 active system features
+        default_permissions = ('add', 'change', 'delete', 'view')
+        # 🖨️ Explicit custom print permission registration
+        permissions = [
+            ("print_event", "Can print events summaries and logs"),
+        ]

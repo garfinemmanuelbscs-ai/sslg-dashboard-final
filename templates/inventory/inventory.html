@@ -1,0 +1,141 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 📦 Logistics & Asset UI Component Overrides */
+    .glass-panel { 
+        background: rgba(30, 41, 59, 0.4); 
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05); 
+        border-radius: 20px; 
+        padding: 24px; 
+    }
+    
+    .table { 
+        color: #e2e8f0 !important; 
+    }
+    .table th { 
+        background: rgba(15, 23, 42, 0.6) !important; 
+        color: #94a3b8 !important; 
+        border-bottom: 2px solid rgba(255,255,255,0.05); 
+    }
+    .table td { 
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+        background: transparent !important; 
+        vertical-align: middle; 
+    }
+    
+    .badge-alert { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-ok { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    
+    .form-control, .form-select { 
+        background-color: rgba(15, 23, 42, 0.6) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+        color: #fff !important; 
+        border-radius: 10px; 
+    }
+    .form-select option { background: #1e293b; color: #fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2 px-0" style="max-width: 1300px; margin: 0 auto;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="fw-bold m-0 text-white">📦 Supply Inventory</h1>
+            <p class="text-secondary m-0">Real-time resource audits and critical restock levels.</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show mb-4 border-0 shadow" role="alert">
+                {% if message.tags == 'error' %}🛡️{% else %}✅{% endif %} {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        {% if perms.inventory.add_item or user.is_superuser %}
+        <div class="col-lg-4">
+            <div class="glass-panel">
+                <h5 class="fw-bold text-white mb-3">Add Stock Resource</h5>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="small text-secondary mb-1">Item Name</label>
+                        <input type="text" name="name" class="form-control" required placeholder="e.g., A4 Bond Paper">
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-secondary mb-1">Quantity</label>
+                        <input type="number" name="quantity" class="form-control" required placeholder="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-secondary mb-1">Item Condition</label>
+                        <select name="condition" class="form-select" required>
+                            <option value="good">Good</option>
+                            <option value="damaged">Damaged</option>
+                            <option value="lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-secondary mb-1">Accountable Custodian</label>
+                        <input type="text" name="custodian" class="form-control" required placeholder="Name of officer">
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold rounded-3 text-dark mt-2">Add New Item</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="{% if perms.inventory.add_item or user.is_superuser %}col-lg-8{% else %}col-12{% endif %}">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-white m-0">📜 Stock Records</h5>
+                    {% if not perms.inventory.add_item and not user.is_superuser %}
+                        <span class="badge bg-secondary text-wrap rounded-pill px-3 py-2">👁️ Read-Only Session</span>
+                    {% endif %}
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table m-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>In-Stock Quantity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in all_items %}
+                            <tr>
+                                <td class="text-light fw-medium">{{ item.name }}</td>
+                                <td class="fw-bold text-white">{{ item.quantity }}</td>
+                                <td>
+                                    {% if item.quantity < 5 %}
+                                        <span class="badge badge-alert">⚠️ LOW STOCK</span>
+                                    {% else %}
+                                        <span class="badge badge-ok">✓ AVAILABLE</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-5">
+                                    📭 No inventory items found in the database directory.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

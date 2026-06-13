@@ -1,0 +1,78 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 📋 Biometric Log Ledger Overrides */
+    .glass-panel { 
+        background: rgba(30, 41, 59, 0.4); 
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05); 
+        border-radius: 20px; 
+        padding: 24px; 
+    }
+    
+    .table { 
+        color: #e2e8f0 !important; 
+    }
+    .table th { 
+        background: rgba(15, 23, 42, 0.6) !important; 
+        color: #94a3b8 !important; 
+        border-bottom: 2px solid rgba(255,255,255,0.05); 
+    }
+    .table td { 
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+        background: transparent !important; 
+        vertical-align: middle; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2 px-0" style="max-width: 1300px; margin: 0 auto;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="fw-bold m-0 text-white">📋 Historical Attendance Log Records</h1>
+            <p class="text-secondary m-0">Comprehensive verification tracking database for checked student accounts.</p>
+        </div>
+        <a href="{% url 'attendance_hub' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back to Hub</a>
+    </div>
+
+    <div class="glass-panel">
+        <div class="table-responsive">
+            <table class="table m-0 align-middle">
+                <thead>
+                    <tr>
+                        <th>Timestamp Date/Time</th>
+                        <th>Student Target User</th>
+                        <th>Terminal Status</th>
+                        <th>Biometric Scanner Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td class="text-secondary small">{{ r.date|date:"Y-m-d H:i:s" }}</td>
+                        <td class="fw-bold text-white">{{ r.student.username }}</td>
+                        <td>
+                            <span class="badge {% if r.status == 'present' %}bg-success text-white{% elif r.status == 'late' %}bg-warning text-dark{% else %}bg-danger text-white{% endif %} text-uppercase rounded-pill px-3 py-1" style="font-size:0.75rem; font-weight: 700;">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                        <td class="text-light-muted small text-white-50">{{ r.remarks|default:"No manual notes compiled." }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-5">
+                            📭 No biometric scan records saved inside the database yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

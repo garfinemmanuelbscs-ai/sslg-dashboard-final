@@ -1,0 +1,115 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* ⏱️ Biometric Hub Interactive Dashboard Navigation Link Blocks */
+    .glass-card { 
+        background: rgba(30, 41, 59, 0.45); 
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.06); 
+        border-radius: 24px; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        text-decoration: none; 
+        display: block; 
+        color: inherit; 
+        height: 100%;
+    }
+    .glass-card:not(.locked-card):hover { 
+        transform: translateY(-5px); 
+        background: rgba(30, 41, 59, 0.6); 
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); 
+        border-color: rgba(56, 189, 248, 0.4); 
+    }
+    
+    /* 🔒 Locked State Styling */
+    .locked-card {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: rgba(15, 23, 42, 0.4);
+        border-style: dashed;
+        pointer-events: none; /* Prevents clicks entirely */
+    }
+    
+    .icon-box { 
+        width: 60px; 
+        height: 60px; 
+        border-radius: 16px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 1.75rem; 
+        margin-bottom: 20px; 
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2 px-0" style="max-width: 1300px; margin: 0 auto;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-2">
+        <div>
+            <h1 class="fw-bold text-white mb-1">⏱️ Attendance Operations Control</h1>
+            <p class="text-secondary m-0">Select an operational module framework to manage student biometric verification profiles.</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-light rounded-pill px-4">Back to Dashboard</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            {% if perms.attendance.add_attendancerecord or user.is_superuser %}
+                <a href="{% url 'scan' %}" class="glass-card p-4">
+                    <div class="icon-box bg-info bg-opacity-20 text-info">📸</div>
+                    <h4 class="text-white fw-bold">Record Attendance</h4>
+                    <p class="text-secondary small mb-4">Launch the integrated terminal web camera scanner to automatically check in profiles using live Face Recognition math metrics.</p>
+                    <span class="text-info small fw-bold">Launch Scanner →</span>
+                </a>
+            {% else %}
+                <div class="glass-card locked-card p-4">
+                    <div class="icon-box bg-secondary bg-opacity-20 text-muted">🔒</div>
+                    <h4 class="text-muted fw-bold">Record Attendance</h4>
+                    <p class="text-muted small mb-4">Launch the integrated terminal web camera scanner to automatically check in profiles using live Face Recognition math metrics.</p>
+                    <span class="text-danger small fw-bold">Access Restrained</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            {% if perms.attendance.view_attendancerecord or user.is_superuser %}
+                <a href="{% url 'attendance_logs' %}" class="glass-card p-4">
+                    <div class="icon-box bg-opacity-20 text-success" style="background-color: rgba(22, 163, 74, 0.2);">📋</div>
+                    <h4 class="text-white fw-bold">Attendance Records</h4>
+                    <p class="text-secondary small mb-4">Browse, inspect, filter, and track historical student check-in timesheets, status indicators, and logged database absence parameters.</p>
+                    <span class="text-success small fw-bold">Open History Logs →</span>
+                </a>
+            {% else %}
+                <div class="glass-card locked-card p-4">
+                    <div class="icon-box bg-secondary bg-opacity-20 text-muted">🔒</div>
+                    <h4 class="text-muted fw-bold">Attendance Records</h4>
+                    <p class="text-muted small mb-4">Browse, inspect, filter, and track historical student check-in timesheets, status indicators, and logged database absence parameters.</p>
+                    <span class="text-danger small fw-bold">Access Restrained</span>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'student_profiles' %}" class="glass-card p-4">
+                    <div class="icon-box bg-warning bg-opacity-20 text-warning">👤</div>
+                    <h4 class="text-white fw-bold">Student Profiles</h4>
+                    <p class="text-secondary small mb-4">Register student identity models, upload base layout headshots to Cloudinary storage buckets, and check verification encoding vectors.</p>
+                    <span class="text-warning small fw-bold">Manage Profiles →</span>
+                </a>
+            {% else %}
+                <div class="glass-card locked-card p-4">
+                    <div class="icon-box bg-secondary bg-opacity-20 text-muted">🔒</div>
+                    <h4 class="text-muted fw-bold">Student Profiles</h4>
+                    <p class="text-secondary small mb-4">Register student identity models, upload base layout headshots to Cloudinary storage buckets, and check verification encoding vectors.</p>
+                    <span class="text-danger small fw-bold">Access Restrained</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

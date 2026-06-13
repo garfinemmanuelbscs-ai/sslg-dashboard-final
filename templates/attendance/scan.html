@@ -1,0 +1,122 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 📹 Biometric Camera Scanner Container UI Overrides */
+    .glass-panel { 
+        background: rgba(30, 41, 59, 0.4); 
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.05); 
+        border-radius: 24px; 
+        padding: 32px; 
+    }
+    
+    .scanner-viewport-wrapper {
+        position: relative;
+        display: inline-block;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 3px solid rgba(56, 189, 248, 0.2);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+    }
+    
+    #webcam {
+        background: #020617;
+        transform: scaleX(-1); /* Flips camera horizontally for natural user feedback mirror experience */
+    }
+    
+    .status-display-deck {
+        font-weight: 600; 
+        font-size: 1.25rem; 
+        min-height: 38px;
+        transition: color 0.2s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2 px-0" style="max-width: 900px; margin: 0 auto;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="fw-bold m-0 text-white">📸 Face Recognition Terminal</h1>
+            <p class="text-secondary m-0">Live automated checking matrix via computer vision arrays.</p>
+        </div>
+        <a href="{% url 'attendance_hub' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back to Hub</a>
+    </div>
+
+    <div class="glass-panel text-center">
+        <div class="scanner-viewport-wrapper mb-4">
+            <video id="webcam" autoplay playsinline width="640" height="480"></video>
+        </div>
+        
+        <div class="d-flex justify-content-center mb-2">
+            <button id="scan-btn" onclick="capture()" class="btn btn-info btn-lg rounded-pill px-5 fw-bold text-white shadow">
+                ⚡ Scan Verification Matrix
+            </button>
+        </div>
+        
+        <canvas id="canvas" style="display:none;"></canvas>
+        <div id="result" class="status-display-deck text-secondary mt-3">📷 System Standby: Ready to initialize tracking...</div>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('webcam');
+    const resultDiv = document.getElementById('result');
+    const scanBtn = document.getElementById('scan-btn');
+
+    // Access the webcam stream arrays safely
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => {
+            console.error("Webcam Node Access Error: ", err);
+            resultDiv.innerText = "❌ Hardware Exception: Optical capture array device not found.";
+            resultDiv.classList.replace('text-secondary', 'text-danger');
+            scanBtn.disabled = true;
+        });
+
+    function capture() {
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        
+        // Compress matrix footprint payload to JPEG
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+        // Update operational tracking logs states
+        resultDiv.innerText = "🤖 Processing Biometrics... Please maintain structural orientation position.";
+        resultDiv.style.color = "#fb923c"; // Orange UI state processing indicator
+        scanBtn.disabled = true;
+
+        fetch('/attendance/verify/', {
+            method: 'POST',
+            body: JSON.stringify({ image: dataUrl }),
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-CSRFToken': '{{ csrf_token }}' 
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            scanBtn.disabled = false;
+            if (data.status === 'success') {
+                resultDiv.innerText = '✅ Access Granted: Identity verified for user ' + data.name;
+                resultDiv.style.color = "#4ade80"; // Crisp bright green access token indicator
+            } else {
+                resultDiv.innerText = '❌ Authentication Denied: ' + (data.message || 'Identity verification vector anomaly. Recalibrate frame and re-scan.');
+                resultDiv.style.color = "#f87171"; // Crisp warning alert red status
+            }
+        })
+        .catch(err => {
+            scanBtn.disabled = false;
+            console.error("Endpoint Fetch Exception Error:", err);
+            resultDiv.innerText = "⚠️ Network Framework Exception. Verify terminal transmission route arrays.";
+            resultDiv.style.color = "#f87171";
+        });
+    }
+</script>
+{% endblock %}

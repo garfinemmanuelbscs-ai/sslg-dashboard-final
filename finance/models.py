@@ -1,5 +1,3 @@
-
-# Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -10,7 +8,7 @@ class Transaction(models.Model):
         max_length=10,
         choices=[('income', 'Income'), ('expense', 'Expense')]
     )
-    date = models.DateField()
+    date = models.DateField(auto_now_add=True)
     officer = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -20,3 +18,8 @@ class Transaction(models.Model):
         app_label = 'finance'              # <-- forces Django to show Finance
         verbose_name = "Transaction"
         verbose_name_plural = "Transactions"
+        default_permissions = ('add', 'view')  # 🛑 Permanently locks out change & delete permissions
+        # 🖨️ Explicit custom print permission registration
+        permissions = [
+            ("print_transaction", "Can print financial ledger registry indices"),
+        ]

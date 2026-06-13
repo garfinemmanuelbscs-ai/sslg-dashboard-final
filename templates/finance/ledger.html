@@ -1,0 +1,142 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 💰 Finance Ledger App Adjustments */
+    .glass-panel { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 24px; }
+    .table { color: #e2e8f0 !important; }
+    .table th { background: rgba(15, 23, 42, 0.6) !important; color: #94a3b8 !important; border-bottom: 2px solid rgba(255,255,255,0.05); }
+    .table td { border-bottom: 1px solid rgba(255,255,255,0.05); background: transparent !important; vertical-align: middle; }
+    .badge-income { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-expense { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    
+    /* Glassmorphic Form styling inputs */
+    .form-control, .form-select {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f8fafc;
+        border-radius: 10px;
+    }
+    .form-control:focus, .form-select:focus {
+        background: rgba(15, 23, 42, 0.6);
+        color: #f8fafc;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
+    }
+    .form-control::placeholder { color: #64748b; }
+    .form-select option { background: #1e293b; color: #f8fafc; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0" style="max-width: 1300px; margin: 0 auto;">
+
+    {% if messages %}
+        <div class="row mb-4">
+            <div class="col-12">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show border-0 shadow-lg text-white bg-dark" role="alert">
+                        {% if message.tags == 'error' %}🛡️{% else %}✅{% endif %} {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold m-0 text-white">{{ title|default:"Finance Ledger" }}</h1>
+            <p class="text-secondary m-0">Complete balance sheets and institutional transaction lines.</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="glass-panel text-center"><h5>Total Income</h5><h3 class="text-success">₱{{ total_income }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5>Total Expenses</h5><h3 class="text-danger">₱{{ total_expense }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5>Net Balance</h5><h3 class="text-info">₱{{ balance }}</h3></div></div>
+    </div>
+
+    <div class="row g-4">
+        {% if perms.finance.add_transaction or user.is_superuser %}
+        <div class="col-lg-4">
+            <div class="glass-panel h-100">
+                <h4 class="fw-bold mb-3 text-info">✨ Record Entry</h4>
+                <form method="POST" action="{% url 'finance_ledger' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-medium">Source / Description</label>
+                        <input type="text" name="source" class="form-control" placeholder="e.g., General Student Fund Collection" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-medium">Transaction Classification</label>
+                        <select name="type" class="form-select" required>
+                            <option value="" disabled selected hidden>Select type...</option>
+                            <option value="income">Income (+)</option>
+                            <option value="expense">Expense (-)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-medium">Financial Value (PHP)</label>
+                        <input type="number" step="0.01" name="amount" class="form-control" placeholder="0.00" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-medium">Date Verified</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-info w-100 rounded-pill fw-bold text-dark shadow">Save</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="{% if perms.finance.add_transaction or user.is_superuser %}col-lg-8{% else %}col-12{% endif %}">
+            <div class="glass-panel h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold m-0 text-secondary">📜 Transaction Logs</h4>
+                    {% if not perms.finance.add_transaction and not user.is_superuser %}
+                        <span class="badge bg-secondary text-wrap rounded-pill px-3 py-2">👁️ Read-Only Session</span>
+                    {% endif %}
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table m-0">
+                        <thead>
+                            <tr>
+                                <th>Description / Source</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Date Passed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in transactions %}
+                            <tr>
+                                <td class="fw-medium text-light">{{ t.source|default:"General Ledger Entry" }}</td>
+                                <td>
+                                    <span class="badge {% if t.type == 'income' %}badge-income{% else %}badge-expense{% endif %}">
+                                        {{ t.type|upper }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold {% if t.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                    ₱{{ t.amount }}
+                                </td>
+                                <td class="text-muted small">{{ t.date }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-5">
+                                    📭 Financial ledger database is clean. No records found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 📊 View-Only Transaction Sheet Styles */
+    .glass-panel { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 24px; }
+    .table { color: #e2e8f0 !important; }
+    .table th { background: rgba(15, 23, 42, 0.6) !important; color: #94a3b8 !important; border-bottom: 2px solid rgba(255,255,255,0.05); }
+    .table td { border-bottom: 1px solid rgba(255,255,255,0.05); background: transparent !important; vertical-align: middle; }
+    .badge-income { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-expense { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0" style="max-width: 1300px; margin: 0 auto;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold m-0 text-white">💰 Finance Ledger Sheets</h1>
+            <p class="text-secondary m-0">Complete balance sheets and institutional transaction lines.</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="glass-panel text-center"><h5>Total Income</h5><h3 class="text-success">₱{{ income }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5>Total Expenses</h5><h3 class="text-danger">₱{{ expense }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5>Net Balance</h5><h3 class="text-info">₱{{ balance }}</h3></div></div>
+    </div>
+
+    <div class="glass-panel">
+        <div class="table-responsive">
+            <table class="table m-0">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="text-light">{{ t.description|default:"General Ledger Entry" }}</td>
+                        <td><span class="badge {% if t.type == 'income' %}badge-income{% else %}badge-expense{% endif %}">{{ t.type|upper }}</span></td>
+                        <td class="fw-bold {% if t.type == 'income' %}text-success{% else %}text-danger{% endif %}">₱{{ t.amount }}</td>
+                        <td class="text-muted small">{{ t.date }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">No records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

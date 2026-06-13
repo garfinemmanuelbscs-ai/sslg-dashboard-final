@@ -1,0 +1,174 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 👤 Profile Manager Grid Customizations */
+    .glass-panel { 
+        background: rgba(30, 41, 59, 0.65); /* Slightly increased opacity for better text contrast */
+        backdrop-filter: blur(16px); 
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08); 
+        border-radius: 20px; 
+        padding: 24px; 
+    }
+    
+    .table { 
+        color: #e2e8f0 !important; 
+    }
+    .table th { 
+        background: rgba(15, 23, 42, 0.8) !important; 
+        color: #cbd5e1 !important; /* Lightened table headers for readability */
+        border-bottom: 2px solid rgba(255,255,255,0.08); 
+    }
+    .table td { 
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+        background: transparent !important; 
+        vertical-align: middle; 
+    }
+    
+    .form-control, .form-select { 
+        background-color: rgba(15, 23, 42, 0.8) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.15) !important; 
+        color: #fff !important; 
+        border-radius: 10px; 
+    }
+    .form-select option { background: #1e293b; color: #fff; }
+
+    /* ✨ High-Contrast Accessibility Overrides for Biometric Statuses */
+    .badge-biometric-verified {
+        background-color: rgba(34, 197, 94, 0.2) !important;
+        color: #4ade80 !important; /* Vibrant high-contrast digital green */
+        border: 1px solid rgba(74, 222, 128, 0.4) !important;
+        text-shadow: 0 0 8px rgba(74, 222, 128, 0.2);
+    }
+
+    .badge-biometric-corrupted {
+        background-color: rgba(239, 68, 68, 0.2) !important;
+        color: #f87171 !important; /* Vibrant high-contrast alert red */
+        border: 1px solid rgba(248, 113, 113, 0.4) !important;
+        text-shadow: 0 0 8px rgba(248, 113, 113, 0.2);
+    }
+
+    /* Lighten standard subtitle description lines */
+    .text-muted-custom {
+        color: #94a3b8 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2 px-0" style="max-width: 1300px; margin: 0 auto;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h1 class="fw-bold m-0 text-white">👤 Biometric Profile Registry</h1>
+            <p class="text-muted-custom m-0">Register identity accounts and coordinate system biometric face models.</p>
+        </div>
+        <div class="d-flex gap-2">
+            {% if perms.attendance.print_studentprofile or user.is_superuser %}
+                <a href="{% url 'print_student_profiles' %}" class="btn btn-info rounded-pill px-4 text-white fw-bold">🖨️ Print Directory</a>
+            {% endif %}
+            <a href="{% url 'attendance_hub' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back to Hub</a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for m in messages %}
+            <div class="alert alert-info bg-dark text-white border-secondary alert-dismissible fade show mb-4 shadow" role="alert">
+                ℹ️ {{ m }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row g-4">
+        {% if perms.attendance.add_studentprofile or user.is_superuser or all_users %}
+        <div class="col-lg-5">
+            <div class="glass-panel">
+                <h5 class="fw-bold text-white mb-3">Register Face Profile</h5>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="small text-muted-custom mb-1 fw-bold">Target User Account</label>
+                        <select name="user" class="form-select" required>
+                            {% if is_staff_or_admin %}
+                                <option value="">-- Choose Account to Enroll --</option>
+                            {% endif %}
+                            {% for u in all_users %}
+                                <option value="{{ u.id }}" selected>{{ u.username }} ({% if u.get_full_name %}{{ u.get_full_name }}{% else %}Self-Registration Box{% endif %})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="small text-muted-custom mb-1 fw-bold">Upload Headshot Photo (Enforce clear lighting)</label>
+                        <input type="file" name="photo" class="form-control" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-info w-100 text-white fw-bold rounded-3">Run DeepFace Vector Compilation</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="{% if perms.attendance.add_studentprofile or user.is_superuser or all_users %}col-lg-7{% else %}col-12{% endif %}">
+            <div class="glass-panel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-white m-0">Enrolled Student Base Directories</h5>
+                    {% if not is_staff_or_admin %}
+                        <span class="badge bg-secondary rounded-pill px-3 py-2">👁️ Personalized Profile View</span>
+                    {% endif %}
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table m-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Account Profile Name</th>
+                                <th>Image Source</th>
+                                <th class="text-end">Biometric Encryption Hash Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in profiles %}
+                            <tr>
+                                <td class="fw-bold text-light">{{ p.user.username }}</td>
+                                <td>
+                                    {% if p.photo %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="{{ p.photo.url }}" 
+                                                 class="rounded bg-dark border border-light border-opacity-10" 
+                                                 style="width: 38px; height: 38px; object-fit: cover;" 
+                                                 alt="Avatar"
+                                                 onerror="this.onerror=null; this.parentElement.querySelector('.fallback-icon').classList.remove('d-none'); this.remove();">
+                                            <div class="fallback-icon d-none bg-danger bg-opacity-20 text-danger rounded border border-danger border-opacity-20 small d-flex align-items-center justify-content-center font-monospace fw-bold" style="width: 38px; height: 38px; font-size: 10px;">
+                                                404
+                                            </div>
+                                            <a href="{{ p.photo.url }}" target="_blank" class="badge bg-secondary text-decoration-none border border-light border-opacity-10 py-2 px-3">View Full Link 🔗</a>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted small">No Image Uploaded</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if p.face_encoding %}
+                                        <span class="badge badge-biometric-verified px-3 py-2">🧬 Facenet 128-D Vector Verified</span>
+                                    {%   else %}
+                                        <span class="badge badge-biometric-corrupted px-3 py-2">⚠️ Vector Calculation Corrupted</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-5">
+                                    📭 Your profile model tracker hasn't been configured yet. Use the register widget card block to launch setup.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
