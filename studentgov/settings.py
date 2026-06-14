@@ -18,12 +18,15 @@ ALLOWED_HOSTS = [
     '.onrender.com', 
     'akagami012-sslg-attendance-system.hf.space',
     'huggingface.co', 
+    '.hf.space',
     '*' # The asterisk acts as a wildcard allowing any connection during testing
+    'akagami012-sslg-admin.hf.space',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://akagami012-sslg-attendance-system.hf.space',
     'https://*.hf.space'
+     'akagami012-sslg-admin.hf.space',
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
