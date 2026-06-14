@@ -134,3 +134,5 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 
 # Where to throw users immediately after signing out
 LOGOUT_REDIRECT_URL = '/login/'
+
+X_FRAME_OPTIONS = 'ALLOW-FROM https://huggingface.co/'
