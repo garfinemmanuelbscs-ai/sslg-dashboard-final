@@ -5,7 +5,7 @@
 <style>
     /* 📹 Biometric Camera Scanner Container UI Overrides */
     .glass-panel { 
-        background: rgba(30, 41, 59, 0.4); 
+        background: rgba(30, 41, 59, 0.4) !important; 
         backdrop-filter: blur(16px); 
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.05); 
@@ -23,7 +23,7 @@
     }
     
     #webcam {
-        background: #020617;
+        background: #020617 !important;
         transform: scaleX(-1); /* Flips camera horizontally for natural user feedback mirror experience */
     }
     
@@ -37,12 +37,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-2 px-0" style="max-width: 900px; margin: 0 auto;">
+<div class="container-fluid mt-2 px-0" data-bs-theme="dark" style="max-width: 900px; margin: 0 auto;">
     
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h1 class="fw-bold m-0 text-white">📸 Face Recognition Terminal</h1>
-            <p class="text-secondary m-0">Live automated checking matrix via computer vision arrays.</p>
+            <p class="text-white-50 m-0" style="color: #94a3b8 !important;">Live automated checking matrix via computer vision arrays.</p>
         </div>
         <a href="{% url 'attendance_hub' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back to Hub</a>
     </div>
@@ -59,7 +59,7 @@
         </div>
         
         <canvas id="canvas" style="display:none;"></canvas>
-        <div id="result" class="status-display-deck text-secondary mt-3">📷 System Standby: Ready to initialize tracking...</div>
+        <div id="result" class="status-display-deck mt-3" style="color: #94a3b8 !important;">📷 System Standby: Ready to initialize tracking...</div>
     </div>
 </div>
 
@@ -74,7 +74,7 @@
         .catch(err => {
             console.error("Webcam Node Access Error: ", err);
             resultDiv.innerText = "❌ Hardware Exception: Optical capture array device not found.";
-            resultDiv.classList.replace('text-secondary', 'text-danger');
+            resultDiv.style.color = "#f87171";
             scanBtn.disabled = true;
         });
 

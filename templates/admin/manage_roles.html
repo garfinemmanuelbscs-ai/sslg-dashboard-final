@@ -4,19 +4,57 @@
 {{ block.super }}
 <style>
     /* Specific Matrix Dashboard Page Overrides */
-    .matrix-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; }
+    .matrix-card { 
+        background: rgba(30, 41, 59, 0.4) !important; 
+        backdrop-filter: blur(16px); 
+        border: 1px solid rgba(255, 255, 255, 0.05) !important; 
+        border-radius: 20px; 
+    }
+    
     .table { color: #f8fafc !important; vertical-align: middle; }
-    .table th { border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important; color: #94a3b8; font-size: 0.8rem; letter-spacing: 0.05em; }
-    .table td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 12px 10px; }
-    .form-control-custom, .form-select-custom { background-color: #0f172a; border: 1px solid rgba(255, 255, 255, 0.1); color: #f8fafc; border-radius: 10px; }
-    .form-control-custom:focus, .form-select-custom:focus { background-color: #0f172a; color: #f8fafc; border-color: #38bdf8; box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25); }
-    .perm-scroll-box { max-height: 180px; overflow-y: auto; background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 15px; }
-    .btn-custom-action { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 10px; font-weight: 600; }
-    .btn-custom-action:hover { background: #38bdf8; color: #0f172a; }
+    .table th { border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important; color: #94a3b8 !important; font-size: 0.8rem; letter-spacing: 0.05em; }
+    
+    /* 🚨 THE TRAP-BREAKER OVERRIDE: Protects matrix data cells from light-mode layout washes */
+    .table tbody tr,
+    .table tbody td,
+    html[data-theme="light"] .table tbody tr,
+    html[data-theme="light"] .table tbody td { 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important; 
+        padding: 12px 10px !important;
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        color: #f8fafc !important;
+    }
+    
+    .form-control-custom, .form-select-custom { 
+        background-color: #0f172a !important; 
+        border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+        color: #f8fafc !important; 
+        border-radius: 10px; 
+    }
+    .form-control-custom:focus, .form-select-custom:focus { 
+        background-color: #0f172a !important; 
+        color: #f8fafc !important; 
+        border-color: #38bdf8 !important; 
+        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25) !important; 
+    }
+    .form-select-custom option { background: #0f172a !important; color: #f8fafc !important; }
+    
+    .perm-scroll-box { 
+        max-height: 180px; 
+        overflow-y: auto; 
+        background: #0f172a !important; 
+        border: 1px solid rgba(255, 255, 255, 0.05) !important; 
+        border-radius: 12px; 
+        padding: 15px; 
+    }
+    .btn-custom-action { background: rgba(56, 189, 248, 0.15) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; border-radius: 10px; font-weight: 600; }
+    .btn-custom-action:hover { background: #38bdf8 !important; color: #0f172a !important; }
     
     /* Modal Styles */
-    .sslg-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(5px); z-index: 1000; justify-content: center; align-items: center; }
-    .sslg-modal-content { background: #1e293b; padding: 25px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid rgba(255, 255, 255, 0.1); color: #f8fafc; }
+    .sslg-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8) !important; backdrop-filter: blur(5px); z-index: 2000 !important; justify-content: center; align-items: center; }
+    .sslg-modal-content { background: #1e293b !important; padding: 25px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #f8fafc !important; }
     .permissions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 15px 0; }
     .role-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); gap: 10px; }
     .action-buttons { display: flex; gap: 5px; }
@@ -24,10 +62,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-2 px-0">
+<div class="container-fluid mt-2 px-0" data-bs-theme="dark">
     <div class="mb-4">
         <h1 class="text-white mb-1" style="font-weight: 700;">⚙️ Access Authorization Matrix</h1>
-        <p class="text-secondary m-0">Initialize staff identities, construct structural permission groups, map application flags, and assign system assets.</p>
+        <p class="text-white-50 m-0" style="color: #94a3b8 !important;">Initialize staff identities, construct structural permission groups, map application flags, and assign system assets.</p>
     </div>
 
     {% if messages %}
@@ -48,29 +86,29 @@
                     <form action="{% url 'create_user' %}" method="POST">
                         {% csrf_token %}
                         <div class="mb-2">
-                            <label class="form-label text-secondary small fw-bold mb-1">SYSTEM USERNAME</label>
+                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">SYSTEM USERNAME</label>
                             <input type="text" name="username" placeholder="e.g., sglc_admin" class="form-control form-control-custom form-control-sm" required>
                         </div>
                         <div class="row g-2 mb-2">
                             <div class="col-5">
-                                <label class="form-label text-secondary small fw-bold mb-1">FIRST NAME</label>
+                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">FIRST NAME</label>
                                 <input type="text" name="first_name" placeholder="John" class="form-control form-control-custom form-control-sm" required>
                             </div>
                             <div class="col-5">
-                                <label class="form-label text-secondary small fw-bold mb-1">LAST NAME</label>
+                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">LAST NAME</label>
                                 <input type="text" name="last_name" placeholder="Doe" class="form-control form-control-custom form-control-sm" required>
                             </div>
                             <div class="col-2">
-                                <label class="form-label text-secondary small fw-bold mb-1">M.I.</label>
+                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">M.I.</label>
                                 <input type="text" name="mi" placeholder="E" maxlength="2" class="form-control form-control-custom form-control-sm">
                             </div>
                         </div>
                         <div class="mb-2">
-                            <label class="form-label text-secondary small fw-bold mb-1">PASSWORD ENTRY</label>
+                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">PASSWORD ENTRY</label>
                             <input type="password" name="password" placeholder="••••••••" class="form-control form-control-custom form-control-sm" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-secondary small fw-bold mb-1">VERIFY PASSWORD</label>
+                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">VERIFY PASSWORD</label>
                             <input type="password" name="re_password" placeholder="••••••••" class="form-control form-control-custom form-control-sm" required>
                         </div>
                         <button type="submit" class="btn btn-custom-action btn-sm w-100 py-2">Provision Identity Node</button>
@@ -82,12 +120,12 @@
                     <form action="{% url 'manage_roles' %}" method="POST">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label class="form-label text-secondary small fw-bold">GROUP / ROLE NAME</label>
+                            <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">GROUP / ROLE NAME</label>
                             <input type="text" name="group_name" placeholder="e.g., Finance Committee" class="form-control form-control-custom form-control-sm" required>
                         </div>
                         
                         <div class="mb-4">
-                            <label class="form-label text-secondary small fw-bold">SELECT SYSTEM PERMISSIONS</label>
+                            <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">SELECT SYSTEM PERMISSIONS</label>
                             <div class="perm-scroll-box">
                                 {% for perm in sslg_permissions %}
                                     <div class="form-check mb-2">
@@ -104,7 +142,7 @@
                     </form>
 
                     <hr class="border-secondary my-3">
-                    <h6 class="text-secondary small fw-bold mb-2">CURRENT ACTIVE GROUPS & CONTROLS</h6>
+                    <h6 class="text-white-50 small fw-bold mb-2" style="color: #94a3b8 !important;">CURRENT ACTIVE GROUPS & CONTROLS</h6>
                     
                     {% for group in groups %}
                     <div class="role-row py-1">
@@ -134,10 +172,10 @@
                                     <input type="hidden" name="group_name" value="{{ group.name }}">
                                     <div class="permissions-grid">
                                         {% for perm in sslg_permissions %}
-                                        <div class="form-check">
+                                        <div class="form-check text-start">
                                             <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}" id="m_{{ group.id }}_{{ perm.id }}"
                                                 {% if perm in group.permissions.all %}checked{% endif %}>
-                                            <label class="form-check-label small" for="m_{{ group.id }}_{{ perm.id }}">
+                                            <label class="form-check-label small text-white" for="m_{{ group.id }}_{{ perm.id }}">
                                                 <span class="text-info font-monospace">[{{ perm.content_type.app_label }}]</span> {{ perm.name }}
                                             </label>
                                         </div>
@@ -153,7 +191,7 @@
                         </div>
                     </div>
                     {% empty %}
-                        <p class="text-muted small py-1">No operational groups built.</p>
+                        <p class="text-white-50 small py-1">No operational groups built.</p>
                     {% endfor %}
                 </div>
             </div>
@@ -174,24 +212,24 @@
                         </thead>
                         <tbody>
                             {% for user in users %}
-                            <tr>
-                                <td class="fw-bold text-white">
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td class="fw-bold text-white" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <span class="text-info font-monospace">@{{ user.username }}</span>
                                 </td>
-                                <td>
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <span class="text-light fw-semibold">{{ user.last_name }}, {{ user.first_name }}</span>
                                     {% if user.studentprofile.middle_initial %}
-                                        <small class="text-muted font-monospace">{{ user.studentprofile.middle_initial }}.</small>
+                                        <small class="text-white-50 font-monospace">{{ user.studentprofile.middle_initial }}.</small>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     {% for group in user.groups.all %}
-                                        <span class="badge bg-info text-dark rounded-pill me-1">{{ group.name }}</span>
+                                        <span class="badge bg-info text-dark rounded-pill me-1" style="font-weight: 600;">{{ group.name }}</span>
                                     {% empty %}
-                                        <span class="text-muted small">Standard Base Access</span>
+                                        <span class="text-white-50 small" style="color: #64748b !important;">Standard Base Access</span>
                                     {% endfor %}
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <div class="d-flex justify-content-end align-items-center gap-2">
                                         
                                         <form action="{% url 'assign_user_role' %}" method="POST" class="d-flex align-items-center gap-1">
@@ -222,11 +260,11 @@
                                             <form action="{% url 'change_user_password' user.id %}" method="POST">
                                                 {% csrf_token %}
                                                 <div class="mb-2">
-                                                    <label class="form-label text-secondary small fw-bold">NEW ACCESS KEY VALUE</label>
+                                                    <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">NEW ACCESS KEY VALUE</label>
                                                     <input type="password" name="password" placeholder="••••••••" class="form-control form-control-custom" required>
                                                 </div>
                                                 <div class="mb-3">
-                                                    <label class="form-label text-secondary small fw-bold">RE-ENTER TO VALIDATE</label>
+                                                    <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">RE-ENTER TO VALIDATE</label>
                                                     <input type="password" name="re_password" placeholder="••••••••" class="form-control form-control-custom" required>
                                                 </div>
                                                 <div class="d-flex justify-content-end gap-2">

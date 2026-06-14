@@ -1,19 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Events Calendar</title>
+    <meta charset="UTF-8">
+    <title>Events Calendar</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; color: #f8fafc; padding: 40px 20px; }
-        .event-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-left: 5px solid #6366f1; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; 
+            min-height: 100vh; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            color: #f8fafc !important; 
+            padding: 40px 20px; 
+        }
+        
+        /* 🚨 Locked Dark Component Backdrops */
+        .event-card { 
+            background: rgba(30, 41, 59, 0.4) !important; 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05) !important; 
+            border-left: 5px solid #6366f1 !important; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 16px; 
+            box-shadow: none !important;
+        }
     </style>
 </head>
-<body class="container">
+<body class="container" data-bs-theme="dark">
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h1 class="fw-bold m-0">📅 Campus Events Timeline</h1>
-            <p class="text-secondary m-0">Upcoming schedules and organizational activity listings.</p>
+            <h1 class="fw-bold m-0 text-white">📅 Campus Events Timeline</h1>
+            <p class="text-white-50 m-0">Upcoming schedules and organizational activity listings.</p>
         </div>
         <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
     </div>
@@ -21,17 +40,19 @@
     <div class="row justify-content-center">
         <div class="col-lg-9">
             {% for event in all_events %}
-            <div class="event-card d-flex justify-content-between align-items-center">
+            <div class="event-card d-flex justify-content-between align-items-center" style="background: rgba(30, 41, 59, 0.4) !important; box-shadow: none !important;">
                 <div>
                     <h4 class="fw-bold text-white mb-1">{{ event.title }}</h4>
-                    <p class="text-secondary small m-0">{{ event.description|default:"No description details provided." }}</p>
+                    <p class="text-white-50 small m-0" style="color: #94a3b8 !important;">{{ event.description|default:"No description details provided." }}</p>
                 </div>
                 <div class="text-end">
-                    <span class="badge bg-dark border border-secondary text-light px-3 py-2 fs-6">{{ event.date }}</span>
+                    <span class="badge bg-dark border border-secondary text-light px-3 py-2 fs-6" style="background-color: #0f172a !important;">{{ event.date }}</span>
                 </div>
             </div>
             {% empty %}
-            <div class="text-center text-muted py-5"><h3>No events are actively scheduled.</h3></div>
+            <div class="text-center text-muted py-5">
+                <h3 style="color: #64748b !important;">📭 No events are actively scheduled.</h3>
+            </div>
             {% endfor %}
         </div>
     </div>

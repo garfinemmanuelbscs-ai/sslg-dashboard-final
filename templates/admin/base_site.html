@@ -3,6 +3,9 @@
 
 {% block extrahead %}
 {{ block.super }}
+<script>
+    document.documentElement.setAttribute('data-bs-theme', 'dark');
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 {% endblock %}
 
@@ -19,6 +22,40 @@
         min-height: 100vh;
     }
 
+    /* 1. Neutralize text color flip for all elements under light mode headers */
+    html[data-theme="light"] h1, html[data-theme="light"] h2, 
+    html[data-theme="light"] h3, html[data-theme="light"] h4, 
+    html[data-theme="light"] h5, html[data-theme="light"] p, 
+    html[data-theme="light"] td, html[data-theme="light"] th, 
+    html[data-theme="light"] label, html[data-theme="light"] span:not(.badge) {
+        color: #f8fafc !important;
+    }
+
+    /* 2. Prevent core container blocks from turning blinding white */
+    html[data-theme="light"] .card, 
+    html[data-theme="light"] .modal-content,
+    [data-bs-theme="light"] .card {
+        background-color: #1e293b !important;
+        color: #f8fafc !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* 3. Secure Bootstrap Form Controls and Tables */
+    html[data-theme="light"] input, 
+    html[data-theme="light"] select, 
+    html[data-theme="light"] textarea {
+        background-color: #0f172a !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    html[data-theme="light"] .table {
+        --bs-table-color: #f8fafc !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-striped-color: #f8fafc !important;
+        --bs-table-striped-bg: rgba(255, 255, 255, 0.02) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
     /* Neutralize default Django admin structural wrappers to kill the white space gaps */
     #header {
         background: transparent !important;

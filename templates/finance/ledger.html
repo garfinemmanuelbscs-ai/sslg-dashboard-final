@@ -4,25 +4,52 @@
 {{ block.super }}
 <style>
     /* 💰 Finance Ledger App Adjustments */
-    .glass-panel { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 24px; }
-    .table { color: #e2e8f0 !important; }
-    .table th { background: rgba(15, 23, 42, 0.6) !important; color: #94a3b8 !important; border-bottom: 2px solid rgba(255,255,255,0.05); }
-    .table td { border-bottom: 1px solid rgba(255,255,255,0.05); background: transparent !important; vertical-align: middle; }
-    .badge-income { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge-expense { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .glass-panel { 
+        background: rgba(30, 41, 59, 0.4) !important; 
+        backdrop-filter: blur(16px); 
+        border: 1px solid rgba(255, 255, 255, 0.05); 
+        border-radius: 20px; 
+        padding: 24px; 
+    }
+    
+    .table { 
+        color: #e2e8f0 !important; 
+    }
+    
+    .table th { 
+        background: rgba(15, 23, 42, 0.6) !important; 
+        color: #94a3b8 !important; 
+        border-bottom: 2px solid rgba(255,255,255,0.05); 
+    }
+    
+    /* 🚨 THE TRAP-BREAKER OVERRIDE */
+    .table tbody tr,
+    .table tbody td,
+    html[data-theme="light"] .table tbody tr,
+    html[data-theme="light"] .table tbody td { 
+        background: transparent !important; 
+        background-color: transparent !important;
+        box-shadow: none !important; 
+        color: #e2e8f0 !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important; 
+        vertical-align: middle; 
+    }
+
+    .badge-income { background: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+    .badge-expense { background: rgba(239, 68, 68, 0.2) !important; color: #fca5a5 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
     
     /* Glassmorphic Form styling inputs */
     .form-control, .form-select {
-        background: rgba(15, 23, 42, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #f8fafc;
+        background: rgba(15, 23, 42, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #f8fafc !important;
         border-radius: 10px;
     }
     .form-control:focus, .form-select:focus {
-        background: rgba(15, 23, 42, 0.6);
-        color: #f8fafc;
-        border-color: #38bdf8;
-        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
+        background: rgba(15, 23, 42, 0.6) !important;
+        color: #f8fafc !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25) !important;
     }
     .form-control::placeholder { color: #64748b; }
     .form-select option { background: #1e293b; color: #f8fafc; }
@@ -30,7 +57,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid px-0" style="max-width: 1300px; margin: 0 auto;">
+<div class="container-fluid px-0" data-bs-theme="dark" style="max-width: 1300px; margin: 0 auto;">
 
     {% if messages %}
         <div class="row mb-4">
@@ -54,9 +81,9 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-md-4"><div class="glass-panel text-center"><h5>Total Income</h5><h3 class="text-success">₱{{ total_income }}</h3></div></div>
-        <div class="col-md-4"><div class="glass-panel text-center"><h5>Total Expenses</h5><h3 class="text-danger">₱{{ total_expense }}</h3></div></div>
-        <div class="col-md-4"><div class="glass-panel text-center"><h5>Net Balance</h5><h3 class="text-info">₱{{ balance }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5 class="text-white-50 small mb-2">Total Income</h5><h3 class="text-success fw-bold">₱{{ total_income }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5 class="text-white-50 small mb-2">Total Expenses</h5><h3 class="text-danger fw-bold">₱{{ total_expense }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5 class="text-white-50 small mb-2">Net Balance</h5><h3 class="text-info fw-bold">₱{{ balance }}</h3></div></div>
     </div>
 
     <div class="row g-4">
@@ -95,7 +122,7 @@
         <div class="{% if perms.finance.add_transaction or user.is_superuser %}col-lg-8{% else %}col-12{% endif %}">
             <div class="glass-panel h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="fw-bold m-0 text-secondary">📜 Transaction Logs</h4>
+                    <h4 class="fw-bold m-0 text-white">📜 Transaction Logs</h4>
                     {% if not perms.finance.add_transaction and not user.is_superuser %}
                         <span class="badge bg-secondary text-wrap rounded-pill px-3 py-2">👁️ Read-Only Session</span>
                     {% endif %}
@@ -113,21 +140,21 @@
                         </thead>
                         <tbody>
                             {% for t in transactions %}
-                            <tr>
-                                <td class="fw-medium text-light">{{ t.source|default:"General Ledger Entry" }}</td>
-                                <td>
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td class="fw-medium text-light" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">{{ t.source|default:"General Ledger Entry" }}</td>
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <span class="badge {% if t.type == 'income' %}badge-income{% else %}badge-expense{% endif %}">
                                         {{ t.type|upper }}
                                     </span>
                                 </td>
-                                <td class="fw-bold {% if t.type == 'income' %}text-success{% else %}text-danger{% endif %}">
+                                <td class="fw-bold {% if t.type == 'income' %}text-success{% else %}text-danger{% endif %}" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     ₱{{ t.amount }}
                                 </td>
-                                <td class="text-muted small">{{ t.date }}</td>
+                                <td class="text-secondary small" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">{{ t.date }}</td>
                             </tr>
                             {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-5">
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td colspan="4" class="text-center text-muted py-5" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     📭 Financial ledger database is clean. No records found.
                                 </td>
                             </tr>

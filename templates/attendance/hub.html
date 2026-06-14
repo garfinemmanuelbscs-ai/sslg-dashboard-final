@@ -5,30 +5,31 @@
 <style>
     /* ⏱️ Biometric Hub Interactive Dashboard Navigation Link Blocks */
     .glass-card { 
-        background: rgba(30, 41, 59, 0.45); 
+        background: rgba(30, 41, 59, 0.45) !important; 
         backdrop-filter: blur(16px); 
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.06); 
+        border: 1px solid rgba(255, 255, 255, 0.06) !important; 
         border-radius: 24px; 
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         text-decoration: none; 
         display: block; 
         color: inherit; 
         height: 100%;
+        box-shadow: none !important;
     }
     .glass-card:not(.locked-card):hover { 
         transform: translateY(-5px); 
-        background: rgba(30, 41, 59, 0.6); 
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); 
-        border-color: rgba(56, 189, 248, 0.4); 
+        background: rgba(30, 41, 59, 0.6) !important; 
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important; 
+        border-color: rgba(56, 189, 248, 0.4) !important; 
     }
     
     /* 🔒 Locked State Styling */
     .locked-card {
-        opacity: 0.5;
+        opacity: 0.5 !important;
         cursor: not-allowed;
-        background: rgba(15, 23, 42, 0.4);
-        border-style: dashed;
+        background: rgba(15, 23, 42, 0.4) !important;
+        border-style: dashed !important;
         pointer-events: none; /* Prevents clicks entirely */
     }
     
@@ -46,12 +47,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-2 px-0" style="max-width: 1300px; margin: 0 auto;">
+<div class="container-fluid mt-2 px-0" data-bs-theme="dark" style="max-width: 1300px; margin: 0 auto;">
     
     <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-2">
         <div>
             <h1 class="fw-bold text-white mb-1">⏱️ Attendance Operations Control</h1>
-            <p class="text-secondary m-0">Select an operational module framework to manage student biometric verification profiles.</p>
+            <p class="text-white-50 m-0" style="color: #94a3b8 !important;">Select an operational module framework to manage student biometric verification profiles.</p>
         </div>
         <a href="{% url 'dashboard' %}" class="btn btn-outline-light rounded-pill px-4">Back to Dashboard</a>
     </div>
@@ -62,14 +63,14 @@
                 <a href="{% url 'scan' %}" class="glass-card p-4">
                     <div class="icon-box bg-info bg-opacity-20 text-info">📸</div>
                     <h4 class="text-white fw-bold">Record Attendance</h4>
-                    <p class="text-secondary small mb-4">Launch the integrated terminal web camera scanner to automatically check in profiles using live Face Recognition math metrics.</p>
+                    <p class="text-white-50 small mb-4" style="color: #94a3b8 !important;">Launch the integrated terminal web camera scanner to automatically check in profiles using live Face Recognition math metrics.</p>
                     <span class="text-info small fw-bold">Launch Scanner →</span>
                 </a>
             {% else %}
                 <div class="glass-card locked-card p-4">
                     <div class="icon-box bg-secondary bg-opacity-20 text-muted">🔒</div>
-                    <h4 class="text-muted fw-bold">Record Attendance</h4>
-                    <p class="text-muted small mb-4">Launch the integrated terminal web camera scanner to automatically check in profiles using live Face Recognition math metrics.</p>
+                    <h4 class="fw-bold" style="color: #64748b !important;">Record Attendance</h4>
+                    <p class="small mb-4" style="color: #64748b !important;">Launch the integrated terminal web camera scanner to automatically check in profiles using live Face Recognition math metrics.</p>
                     <span class="text-danger small fw-bold">Access Restrained</span>
                 </div>
             {% endif %}
@@ -80,14 +81,14 @@
                 <a href="{% url 'attendance_logs' %}" class="glass-card p-4">
                     <div class="icon-box bg-opacity-20 text-success" style="background-color: rgba(22, 163, 74, 0.2);">📋</div>
                     <h4 class="text-white fw-bold">Attendance Records</h4>
-                    <p class="text-secondary small mb-4">Browse, inspect, filter, and track historical student check-in timesheets, status indicators, and logged database absence parameters.</p>
+                    <p class="text-white-50 small mb-4" style="color: #94a3b8 !important;">Browse, inspect, filter, and track historical student check-in timesheets, status indicators, and logged database absence parameters.</p>
                     <span class="text-success small fw-bold">Open History Logs →</span>
                 </a>
             {% else %}
                 <div class="glass-card locked-card p-4">
                     <div class="icon-box bg-secondary bg-opacity-20 text-muted">🔒</div>
-                    <h4 class="text-muted fw-bold">Attendance Records</h4>
-                    <p class="text-muted small mb-4">Browse, inspect, filter, and track historical student check-in timesheets, status indicators, and logged database absence parameters.</p>
+                    <h4 class="fw-bold" style="color: #64748b !important;">Attendance Records</h4>
+                    <p class="small mb-4" style="color: #64748b !important;">Browse, inspect, filter, and track historical student check-in timesheets, status indicators, and logged database absence parameters.</p>
                     <span class="text-danger small fw-bold">Access Restrained</span>
                 </div>
             {% endif %}
@@ -98,14 +99,14 @@
                 <a href="{% url 'student_profiles' %}" class="glass-card p-4">
                     <div class="icon-box bg-warning bg-opacity-20 text-warning">👤</div>
                     <h4 class="text-white fw-bold">Student Profiles</h4>
-                    <p class="text-secondary small mb-4">Register student identity models, upload base layout headshots to Cloudinary storage buckets, and check verification encoding vectors.</p>
+                    <p class="text-white-50 small mb-4" style="color: #94a3b8 !important;">Register student identity models, upload base layout headshots to Cloudinary storage buckets, and check verification encoding vectors.</p>
                     <span class="text-warning small fw-bold">Manage Profiles →</span>
                 </a>
             {% else %}
                 <div class="glass-card locked-card p-4">
                     <div class="icon-box bg-secondary bg-opacity-20 text-muted">🔒</div>
-                    <h4 class="text-muted fw-bold">Student Profiles</h4>
-                    <p class="text-secondary small mb-4">Register student identity models, upload base layout headshots to Cloudinary storage buckets, and check verification encoding vectors.</p>
+                    <h4 class="fw-bold" style="color: #64748b !important;">Student Profiles</h4>
+                    <p class="small mb-4" style="color: #64748b !important;">Register student identity models, upload base layout headshots to Cloudinary storage buckets, and check verification encoding vectors.</p>
                     <span class="text-danger small fw-bold">Access Restrained</span>
                 </div>
             {% endif %}

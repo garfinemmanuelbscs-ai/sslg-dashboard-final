@@ -5,7 +5,7 @@
 <style>
     /* 🛸 Event Matrix Theme Overrides */
     .glass-panel { 
-        background: rgba(30, 41, 59, 0.4); 
+        background: rgba(30, 41, 59, 0.4) !important; 
         backdrop-filter: blur(16px); 
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.05); 
@@ -13,38 +13,49 @@
         padding: 24px; 
     }
     .kpi-card {
-        background: rgba(15, 23, 42, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: rgba(15, 23, 42, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
         border-radius: 16px;
         padding: 20px;
     }
+    
     .table { color: #e2e8f0 !important; }
     .table th { 
         background: rgba(15, 23, 42, 0.6) !important; 
         color: #94a3b8 !important; 
         border-bottom: 2px solid rgba(255,255,255,0.05); 
     }
-    .table td { 
-        border-bottom: 1px solid rgba(255,255,255,0.05); 
+    
+    /* 🚨 Global Table Cell Safety-Net Rules */
+    .table tbody tr,
+    .table tbody td,
+    html[data-theme="light"] .table tbody tr,
+    html[data-theme="light"] .table tbody td { 
         background: transparent !important; 
+        background-color: transparent !important;
+        box-shadow: none !important; 
+        color: #e2e8f0 !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important; 
         vertical-align: middle; 
     }
+    
     .form-control, .form-select, .form-textarea { 
         background-color: rgba(15, 23, 42, 0.6) !important; 
         border: 1px solid rgba(255, 255, 255, 0.1) !important; 
         color: #fff !important; 
         border-radius: 10px; 
     }
+    .form-select option { background: #1e293b; color: #fff; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-2 px-0" style="max-width: 1400px; margin: 0 auto;">
+<div class="container-fluid mt-2 px-0" data-bs-theme="dark" style="max-width: 1400px; margin: 0 auto;">
     
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h1 class="fw-bold m-0 text-white">🎪 Operational Events Matrix</h1>
-            <p class="text-secondary m-0">Consolidated logistical coordination board, participant volumes, and financial tracking structures.</p>
+            <p class="text-white-50 m-0">Consolidated logistical coordination board, participant volumes, and financial tracking structures.</p>
         </div>
     </div>
 
@@ -60,19 +71,19 @@
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="kpi-card">
-                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Combined Total Budgets</span>
+                <span class="text-white-50 small fw-bold text-uppercase d-block mb-1" style="color: #94a3b8 !important;">Combined Total Budgets</span>
                 <h3 class="fw-bold text-info m-0">${{ total_budget|floatformat:2 }}</h3>
             </div>
         </div>
         <div class="col-md-3">
             <div class="kpi-card">
-                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Actual Net Balance Spent</span>
+                <span class="text-white-50 small fw-bold text-uppercase d-block mb-1" style="color: #94a3b8 !important;">Actual Net Balance Spent</span>
                 <h3 class="fw-bold text-warning m-0">${{ total_expense|floatformat:2 }}</h3>
             </div>
         </div>
         <div class="col-md-3">
             <div class="kpi-card">
-                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Financial Net Margin Variance</span>
+                <span class="text-white-50 small fw-bold text-uppercase d-block mb-1" style="color: #94a3b8 !important;">Financial Net Margin Variance</span>
                 <h3 class="fw-bold {% if financial_variance >= 0 %}text-success{% else %}text-danger{% endif %} m-0">
                     ${{ financial_variance|floatformat:2 }}
                 </h3>
@@ -80,7 +91,7 @@
         </div>
         <div class="col-md-3">
             <div class="kpi-card">
-                <span class="text-secondary small fw-bold text-uppercase d-block mb-1">Total Verified Attendees</span>
+                <span class="text-white-50 small fw-bold text-uppercase d-block mb-1" style="color: #94a3b8 !important;">Total Verified Attendees</span>
                 <h3 class="fw-bold text-white m-0">👥 {{ total_participants }}</h3>
             </div>
         </div>
@@ -94,35 +105,35 @@
                 <form method="POST" action="{% url 'create_event' %}">
                     {% csrf_token %}
                     <div class="mb-2">
-                        <label class="small text-secondary fw-bold mb-1">Event Target Title</label>
+                        <label class="small text-white-50 fw-bold mb-1">Event Target Title</label>
                         <input type="text" name="title" class="form-control" required placeholder="e.g. Annual IT Tech Symposium">
                     </div>
                     <div class="mb-2">
-                        <label class="small text-secondary fw-bold mb-1">Venue Location Map</label>
+                        <label class="small text-white-50 fw-bold mb-1">Venue Location Map</label>
                         <input type="text" name="venue" class="form-control" required placeholder="e.g. Grand Campus Auditorium">
                     </div>
                     <div class="row g-2 mb-2">
                         <div class="col-6">
-                            <label class="small text-secondary fw-bold mb-1">Target Date</label>
+                            <label class="small text-white-50 fw-bold mb-1">Target Date</label>
                             <input type="date" name="date" class="form-control" required>
                         </div>
                         <div class="col-6">
-                            <label class="small text-secondary fw-bold mb-1">Initial Target Budget</label>
+                            <label class="small text-white-50 fw-bold mb-1">Initial Target Budget</label>
                             <input type="number" step="0.01" name="budget" class="form-control" required placeholder="0.00">
                         </div>
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label class="small text-secondary fw-bold mb-1">Actual Net Expenses</label>
+                            <label class="small text-white-50 fw-bold mb-1">Actual Net Expenses</label>
                             <input type="number" step="0.01" name="actual_expense" class="form-control" placeholder="Optional">
                         </div>
                         <div class="col-6">
-                            <label class="small text-secondary fw-bold mb-1">Participant Count</label>
+                            <label class="small text-white-50 fw-bold mb-1">Participant Count</label>
                             <input type="number" name="participants" class="form-control" value="0">
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="small text-secondary fw-bold mb-1">Core Description Abstract</label>
+                        <label class="small text-white-50 fw-bold mb-1">Core Description Abstract</label>
                         <textarea name="description" class="form-control" rows="2" placeholder="Write operational scope specs..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-info w-100 text-white fw-bold">Save Operation</button>
@@ -146,24 +157,22 @@
                         </thead>
                         <tbody>
                             {% for e in events %}
-                            <tr>
-                                <td>
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <span class="fw-bold d-block text-white">{{ e.title }}</span>
-                                    <small class="text-secondary text-white-50">{{ e.description|default:"No explicit abstract notes logged."|truncatechars:60 }}</small>
+                                    <small class="text-white-50" style="color: #94a3b8 !important;">{{ e.description|default:"No explicit abstract notes logged."|truncatechars:60 }}</small>
                                 </td>
-                                <td>
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <span class="d-block text-light small">📅 {{ e.date|date:"Y-m-d" }}</span>
-                                    <small class="text-secondary">📍 {{ e.venue }}</small>
+                                    <small class="text-white-50" style="color: #94a3b8 !important;">📍 {{ e.venue }}</small>
                                 </td>
-                                <td>
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <div class="small">
-                                        {# 🌟 Fixed triple brace typo below #}
-                                        <span class="text-secondary">Allocated:</span> <strong class="text-info">${{ e.budget }}</strong>
+                                        <span class="text-white-50" style="color: #94a3b8 !important;">Allocated:</span> <strong class="text-info">${{ e.budget }}</strong>
                                     </div>
                                     <div class="small">
-                                        <span class="text-secondary">Spent:</span> 
+                                        <span class="text-white-50" style="color: #94a3b8 !important;">Spent:</span> 
                                         {% if e.actual_expense is not None %}
-                                            {# 🌟 Fixed triple brace typo below #}
                                             <strong class="text-warning">${{ e.actual_expense }}</strong>
                                             <span class="badge {% if e.burn_rate > 100 %}bg-danger{% else %}bg-success{% endif %} rounded-pill ms-1" style="font-size: 0.65rem;">
                                                 {{ e.burn_rate|floatformat:0 }}% Capacity Used
@@ -173,7 +182,7 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     <div class="d-flex justify-content-end gap-1">
                                         {% if is_modifier %}
                                         <button class="btn btn-sm btn-outline-light py-1 px-2 rounded" type="button" data-bs-toggle="collapse" data-bs-target="#edit-panel-{{ e.id }}">
@@ -193,11 +202,11 @@
                                         <form method="POST" action="{% url 'update_expense' e.id %}" class="bg-dark p-2 rounded text-start border border-secondary border-opacity-20 shadow">
                                             {% csrf_token %}
                                             <div class="mb-1">
-                                                <label class="text-secondary small fw-bold" style="font-size:0.7rem;">Overwriting Actual Expenses</label>
+                                                <label class="text-white-50 small fw-bold" style="font-size:0.7rem;">Overwriting Actual Expenses</label>
                                                 <input type="number" step="0.01" name="actual_expense" class="form-control form-control-sm" value="{{ e.actual_expense|default:'' }}" placeholder="0.00">
                                             </div>
                                             <div class="mb-2">
-                                                <label class="text-secondary small fw-bold" style="font-size:0.7rem;">Headcount Registry</label>
+                                                <label class="text-white-50 small fw-bold" style="font-size:0.7rem;">Headcount Registry</label>
                                                 <input type="number" name="participants" class="form-control form-control-sm" value="{{ e.participants }}">
                                             </div>
                                             <button type="submit" class="btn btn-info btn-sm text-white w-100 fw-bold" style="font-size:0.75rem;">Commit Update</button>
@@ -206,8 +215,8 @@
                                 </td>
                             </tr>
                             {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-5">
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td colspan="4" class="text-center text-muted py-5" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     📭 Logistical index clear. No tracking events profiles initialized inside system databases.
                                 </td>
                             </tr>

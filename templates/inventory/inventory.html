@@ -5,7 +5,7 @@
 <style>
     /* 📦 Logistics & Asset UI Component Overrides */
     .glass-panel { 
-        background: rgba(30, 41, 59, 0.4); 
+        background: rgba(30, 41, 59, 0.4) !important; 
         backdrop-filter: blur(16px); 
         -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.05); 
@@ -21,14 +21,9 @@
         color: #94a3b8 !important; 
         border-bottom: 2px solid rgba(255,255,255,0.05); 
     }
-    .table td { 
-        border-bottom: 1px solid rgba(255,255,255,0.05); 
-        background: transparent !important; 
-        vertical-align: middle; 
-    }
     
-    .badge-alert { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .badge-ok { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-alert { background: rgba(239, 68, 68, 0.2) !important; color: #fca5a5 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
+    .badge-ok { background: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
     
     .form-control, .form-select { 
         background-color: rgba(15, 23, 42, 0.6) !important; 
@@ -41,7 +36,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-2 px-0" style="max-width: 1300px; margin: 0 auto;">
+<div class="container-fluid mt-2 px-0" data-bs-theme="dark" style="max-width: 1300px; margin: 0 auto;">
     
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
@@ -113,10 +108,14 @@
                         </thead>
                         <tbody>
                             {% for item in all_items %}
-                            <tr>
-                                <td class="text-light fw-medium">{{ item.name }}</td>
-                                <td class="fw-bold text-white">{{ item.quantity }}</td>
-                                <td>
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td class="fw-medium" style="color: #e2e8f0 !important; background: transparent !important; background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
+                                    {{ item.name }}
+                                  </td>
+                                <td class="fw-bold" style="color: #ffffff !important; background: transparent !important; background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
+                                    {{ item.quantity }}
+                                </td>
+                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
                                     {% if item.quantity < 5 %}
                                         <span class="badge badge-alert">⚠️ LOW STOCK</span>
                                     {% else %}
@@ -125,8 +124,8 @@
                                 </td>
                             </tr>
                             {% empty %}
-                            <tr>
-                                <td colspan="3" class="text-center text-muted py-5">
+                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td colspan="3" class="text-center text-muted py-5" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     📭 No inventory items found in the database directory.
                                 </td>
                             </tr>
