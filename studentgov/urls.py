@@ -32,6 +32,11 @@ urlpatterns = [
     path('attendance/logs/', attendance_views.attendance_logs, name='attendance_logs'),
     path('attendance/profiles/', attendance_views.student_profiles_manage, name='student_profiles'),
     path('attendance/verify/', attendance_views.verify_face, name='verify_face'),
+    
+    # 🗑️ Dynamic Biometric & Attendance Log Purge Handlers
+    path('attendance/profile/delete/<int:profile_id>/', attendance_views.delete_profile_photo, name='delete_profile_photo'),
+    path('attendance/logs/delete/<int:log_id>/', attendance_views.delete_attendance_log, name='delete_attendance_log'),
+    
     # 🖨️ Documentation Print Routes (Attendance)
     path('attendance/print/profiles/', attendance_views.print_student_profiles, name='print_student_profiles'),
     path('attendance/print/records/', attendance_views.print_attendance_records, name='print_attendance_records'),
@@ -68,6 +73,5 @@ urlpatterns = [
 ]
 
 # 📸 LOCAL ASSET ROUTING MATRIX ACCELERATOR
-# This tells Django to explicitly look in your local hard drive folders for media uploads when running locally
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

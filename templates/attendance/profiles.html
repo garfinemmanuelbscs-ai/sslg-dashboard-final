@@ -128,7 +128,8 @@
                             <tr>
                                 <th>Account Profile Name</th>
                                 <th>Image Source</th>
-                                <th class="text-end">Biometric Encryption Hash Status</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,23 +147,35 @@
                                             <div class="fallback-icon d-none bg-danger bg-opacity-20 text-danger rounded border border-danger border-opacity-20 small d-flex align-items-center justify-content-center font-monospace fw-bold" style="width: 38px; height: 38px; font-size: 10px;">
                                                 404
                                             </div>
-                                            <a href="{{ p.photo.url }}" target="_blank" class="badge bg-secondary text-decoration-none border border-light border-opacity-10 py-2 px-3">View Full Link 🔗</a>
+                                            <a href="{{ p.photo.url }}" target="_blank" class="badge bg-secondary text-decoration-none border border-light border-opacity-10 py-2 px-2" style="font-size: 11px;">View 🔗</a>
                                         </div>
                                     {% else %}
                                         <span class="text-white-50 small" style="color: #64748b !important;">No Image Uploaded</span>
                                     {% endif %}
                                 </td>
-                                <td class="text-end">
+                                <td>
                                     {% if p.face_encoding %}
-                                        <span class="badge badge-biometric-verified px-3 py-2">🧬 Facenet 128-D Vector Verified</span>
+                                        <span class="badge badge-biometric-verified px-3 py-2" style="font-size: 11px;">🧬 VGG-Face 2622-D Vector Verified</span>
                                     {% else %}
-                                        <span class="badge badge-biometric-corrupted px-3 py-2">⚠️ Vector Calculation Corrupted</span>
+                                        <span class="badge badge-biometric-corrupted px-3 py-2" style="font-size: 11px;">⚠️ Vector Calculation Corrupted</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if p.photo %}
+                                        <form action="{% url 'delete_profile_photo' p.id %}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to clear this face profile to allow replacing it?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3" style="font-size: 11px; font-weight: 600;">
+                                                ⚙️ Clear / Replace
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-white-50 small">Ready for upload</span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% empty %}
                             <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
-                                <td colspan="3" class="text-center text-muted py-5" style="color: #64748b !important;">
+                                <td colspan="4" class="text-center text-muted py-5" style="color: #64748b !important;">
                                     📭 Your profile model tracker hasn't been configured yet. Use the register widget card block to launch setup.
                                 </td>
                             </tr>
