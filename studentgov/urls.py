@@ -69,8 +69,7 @@ urlpatterns = [
     path('admin-control/group/delete/<int:group_id>/', main_views.delete_group, name='delete_group'),
     path('admin-control/group/assign/', main_views.assign_user_role, name='assign_user_role'),
     
-    path('secret-backend/', admin.site.urls),
-]
+    path('admin/', admin.site.urls),
 
 # 📸 LOCAL ASSET ROUTING MATRIX ACCELERATOR
 if settings.DEBUG:
