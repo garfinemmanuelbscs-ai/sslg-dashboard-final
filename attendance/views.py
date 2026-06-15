@@ -213,7 +213,7 @@ def verify_face(request):
             
             # 🛡️ STRICT SECURITY THRESHOLD FOR VGG-FACE + COSINE DISTANCE
             # 0.40 is too loose. 0.25 means they must look 75% identical biometric-wise.
-            SECURITY_THRESHOLD = 0.25 
+            SECURITY_THRESHOLD = 0.35
             
             print(f"\n🚀 --- NEW BIOMETRIC SCANNER FRAME ---")
             print(f"Total Database Profiles to Compare: {len(valid_profiles)}")
