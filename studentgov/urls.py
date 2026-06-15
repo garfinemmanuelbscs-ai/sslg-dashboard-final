@@ -73,8 +73,9 @@ urlpatterns = [
     path('admin-control/group/assign/', main_views.assign_user_role, name='assign_user_role'),
     
     path('admin/', admin.site.urls),
-] # <--- 💡 FIX: This closing square bracket was missing!
+]
 
-# 📸 LOCAL ASSET ROUTING MATRIX ACCELERATOR
-if settings.DEBUG:
+# 🖼️ PRODUCTION ASSET ROUTING MATRIX FORCE-MULTIPLIER
+# This guarantees that uploaded profile media routes are processed inside Hugging Face spaces
+if settings.MEDIA_URL and settings.MEDIA_ROOT:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -8,11 +8,13 @@ ENV HOME=/home/user
 ENV PATH=/home/user/.local/bin:$PATH
 
 # 3. Install system dependencies required for OpenCV, TensorFlow, and Psycopg2
+# ⚙️ UPDATED: Added wget here so the system can download the biometric weights safely
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
     build-essential \
     libpq-dev \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # 4. Provision the non-root user (Hugging Face UID 1000 standard)
@@ -34,6 +36,10 @@ COPY --chown=user:user . /app/
 
 # 8. Set up local directories for DeepFace weights and Django assets
 RUN mkdir -p /home/user/.deepface/weights /app/staticfiles /app/media
+
+# 🧠 PRE-DOWNLOAD DEEPFACE WEIGHTS TO PREVENT RUNTIME TIMEOUTS
+# Pulls down the model file directly during the build layer phase
+RUN wget -O /home/user/.deepface/weights/vgg_face_weights.h5 https://huggingface.co/Hodfa71/deepface-weights/resolve/main/vgg_face_weights.h5
 
 # 9. Collect static files safely into the allocated workspace
 RUN python manage.py collectstatic --noinput

@@ -5,36 +5,35 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- SECURITY ---
-# Force DEBUG to True for your local computer environment
 DEBUG = True
 
-# 🟢 FIXED: Restored the missing SECRET_KEY fallback to stop the engine crash
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-local-dev-key-swap-out-in-production-environments-xyz')
 
-# Allows both your live production spaces AND your local machine to connect safely
+# 🟢 FIXED: Added missing commas to prevent string literal concatenation bugs
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '.onrender.com', 
     'akagami012-sslg-attendance-system.hf.space',
+    'akagami012-sslg-admin.hf.space',
     'huggingface.co', 
     '.hf.space',
-    '*' # The asterisk acts as a wildcard allowing any connection during testing
-    'akagami012-sslg-admin.hf.space',
+    '*', 
 ]
 
+# 🟢 FIXED: Restored complete https:// protocols and clean comma separation matrix
 CSRF_TRUSTED_ORIGINS = [
     'https://akagami012-sslg-attendance-system.hf.space',
-    'https://*.hf.space'
-     'akagami012-sslg-admin.hf.space',
+    'https://akagami012-sslg-admin.hf.space',
+    'https://*.hf.space',
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# --- APPS (ADMIN IS KEPT RUNNING IN THE BACKGROUND) ---
+# --- APPS ---
 INSTALLED_APPS = [
     'cloudinary_storage',
-    'django.contrib.admin',  # Kept active to manage database login processing
+    'django.contrib.admin',  
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -61,7 +60,6 @@ MIDDLEWARE = [
 ]
 
 # --- DATABASE ---
-# 🚀 AUTOMATED MULTI-ROUTING FOR SUPABASE & SQLITE
 if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
@@ -71,18 +69,15 @@ if os.environ.get('DATABASE_URL'):
         )
     }
     
-    # 🩹 CLEANUP PATCH: Strips '?pgbouncer=true' parameters to prevent psycopg2 engine from crashing
     if 'OPTIONS' in DATABASES['default'] and 'pgbouncer' in DATABASES['default']['OPTIONS']:
         del DATABASES['default']['OPTIONS']['pgbouncer']
     
-    # 🛠️ Migration Interceptor: If running migrate commands, switch to the DIRECT_URL port
     if os.environ.get('DIRECT_URL') and any(cmd in os.sys.argv for cmd in ['migrate', 'makemigrations']):
         DATABASES['default'] = dj_database_url.parse(os.environ.get('DIRECT_URL'))
         DATABASES['default']['OPTIONS'] = {
             'target_session_attrs': 'read-write',
         }
 else:
-    # 💻 Local Dev Fallback: Uses standard SQLite if cloud variables are missing
     DATABASES = {
         'default': dj_database_url.config(
             default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
@@ -90,7 +85,7 @@ else:
         )
     }
 
-# --- STATIC & MEDIA ---
+# --- STATIC & STORAGE ---
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -103,6 +98,7 @@ CLOUDINARY_STORAGE = {
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Kept as local safe backup fallback
 
 # --- TEMPLATES CONFIGURATION ---
 ROOT_URLCONF = 'studentgov.urls'
@@ -129,13 +125,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Where to drop users who aren't signed in yet
 LOGIN_URL = '/login/'
-
-# Where to forward users immediately after a successful sign-in
 LOGIN_REDIRECT_URL = '/dashboard/'
-
-# Where to throw users immediately after signing out
 LOGOUT_REDIRECT_URL = '/login/'
 
 X_FRAME_OPTIONS = 'ALLOW-FROM https://huggingface.co/'
