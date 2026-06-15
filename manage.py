@@ -5,7 +5,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project_name.settings') # Keep your original project name here
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'studentgov.settings')
     
     # 🚨 THE CLEANUP TRICK: Deletes duplicate items before migrations fire off
     if 'migrate' in sys.argv:
