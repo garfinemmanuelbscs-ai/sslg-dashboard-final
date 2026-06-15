@@ -70,6 +70,7 @@ urlpatterns = [
     path('admin-control/group/assign/', main_views.assign_user_role, name='assign_user_role'),
     
     path('admin/', admin.site.urls),
+] # <--- 💡 FIX: This closing square bracket was missing!
 
 # 📸 LOCAL ASSET ROUTING MATRIX ACCELERATOR
 if settings.DEBUG:
