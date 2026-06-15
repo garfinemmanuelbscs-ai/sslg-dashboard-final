@@ -45,11 +45,14 @@ urlpatterns = [
     path('finance/transactions/', finance_views.finance_ledger, name='finance_ledger'),
     # 🖨️ Documentation Print Routes (Finance)
     path('finance/print/', finance_views.print_finance_ledger, name='print_finance_ledger'),
+    # 🗑️ FIX: Add this line right here to route the delete action!
+    path('finance/transactions/delete/<int:transaction_id>/', finance_views.delete_transaction, name='delete_transaction'),
     
     # 🔄 Production App Mappings (Inventory)
     path('inventory/items/', inventory_views.inventory_management, name='inventory_management'),
     # 🖨️ Documentation Print Routes (Inventory)
     path('inventory/print/list/', inventory_views.print_inventory, name='print_inventory'),
+    path('inventory/delete/<int:item_id>/', inventory_views.delete_item, name='delete_item'),
     
     # 🎪 Real Events App Routes
     path('events/calendar/', events_views.events_dashboard, name='events_calendar'), 

@@ -1,33 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import F
-from .models import Item
-
-# ==========================================
-# 🔐 GRANULAR INVENTORY SECURITY CONTROLLERS
-# ==========================================
+from .models import Item, InventoryLog
 
 def is_inventory_authorized(user):
-    """🛡️ Multi-layered permission check matching explicit and inherited group states for inventory"""
     if not user or user.is_anonymous:
         return False
-        
-    # 🕵️‍♂️ TEMPORARY DIAGNOSTIC CONSOLE LOG
-    print("\n=== ⚙️ INVENTORY SECURITY CREDENTIAL DIAGNOSTIC MATRIX ===")
-    print(f"User Attempting Access: '{user.username}'")
-    print(f"Is Root Superuser:       {user.is_superuser}")
-    print(f"Active Groups Linked:    {list(user.groups.values_list('name', flat=True))}")
-    
-    # Check what permissions are actually bundled inside those groups
-    group_permission_tokens = []
-    for group in user.groups.all():
-        for perm in group.permissions.all():
-            group_permission_tokens.append(f"{perm.content_type.app_label}.{perm.codename}")
-            
-    print(f"Permissions via Groups:  {group_permission_tokens}")
-    print("========================================================\n")
-        
     return (
         user.is_superuser or 
         user.username.lower() == 'admin' or 
@@ -36,7 +15,6 @@ def is_inventory_authorized(user):
     )
 
 def can_print_inventory(user):
-    """🛡️ Guardrail: Only allows roles with explicit inventory printing permissions to generate summaries"""
     if not user or user.is_anonymous:
         return False
     return (
@@ -46,17 +24,11 @@ def can_print_inventory(user):
         user.groups.filter(permissions__codename='print_item').exists()
     )
 
-
-# ==========================================
-# 🏛️ INVENTORY MANAGEMENT CORE GATEWAYS
-# ==========================================
-
 @login_required
 @user_passes_test(is_inventory_authorized, login_url='dashboard')
 def inventory_management(request):
-    """📦 Live Inventory Registry & Asset Tracker View"""
+    """📦 Core Inventory Matrix Controller with Automated Dynamic Stock Balance Updating"""
     if request.method == 'POST':
-        # 🛡️ GRANULAR WRITE SECURITY GATEWAY
         is_write_authorized = (
             request.user.is_superuser or 
             request.user.username.lower() == 'admin' or 
@@ -65,49 +37,97 @@ def inventory_management(request):
         )
         
         if not is_write_authorized:
-            messages.error(request, "Access Denied: Your assigned role is Read-Only and lacks explicit inventory write privileges.")
+            messages.error(request, "Access Denied: You lack explicit privileges to alter inventory stock levels.")
             return redirect('inventory_management')
 
-        # 📥 Secure Data Processing Block
-        name = request.POST.get('name')
-        quantity = request.POST.get('quantity')
-        condition = request.POST.get('condition')
-        custodian = request.POST.get('custodian')
-        
-        if name and quantity and condition and custodian:
+        name = request.POST.get('name', '').strip()
+        quantity_str = request.POST.get('quantity')
+        action_type = request.POST.get('action_type') # 'add', 'borrow', 'lost'
+        remarks = request.POST.get('remarks', '').strip()
+        custodian = request.POST.get('custodian', '').strip() or request.user.username
+
+        if name and quantity_str and action_type:
             try:
-                Item.objects.create(
-                    name=name,
-                    quantity=int(quantity),
-                    condition=condition,
-                    custodian=custodian
+                qty = int(quantity_str)
+                if qty <= 0:
+                    messages.error(request, "Invalid Quantity: Input value must be greater than zero.")
+                    return redirect('inventory_management')
+
+                # 🗂️ Check if item already exists or instantiate a fresh master definition
+                item, created = Item.objects.get_or_create(
+                    name__iexact=name, 
+                    defaults={'name': name, 'quantity': 0, 'custodian': custodian}
                 )
-                messages.success(request, f"Successfully registered item: {name} into stock!")
+
+                # 📊 Execute Stock Accounting Calculations
+                if action_type == 'add':
+                    item.quantity += qty
+                    item.condition = 'good'
+                elif action_type in ['borrow', 'lost']:
+                    if item.quantity < qty:
+                        messages.error(request, f"Transaction Rejected: Insufficient stock. Only ({item.quantity}) items available for '{item.name}'.")
+                        return redirect('inventory_management')
+                    
+                    item.quantity -= qty
+                    if action_type == 'lost':
+                        item.condition = 'lost'
+
+                if custodian:
+                    item.custodian = custodian
+                item.save()
+
+                # 📝 Create the permanent chronological transaction audit log entry
+                InventoryLog.objects.create(
+                    item=item,
+                    action_type=action_type,
+                    quantity=qty,
+                    officer=request.user,
+                    remarks=remarks if remarks else f"Stock updated via inventory console."
+                )
+
+                messages.success(request, f"Successfully recorded transaction line item for {item.name}!")
             except Exception as e:
-                messages.error(request, f"Failed to register asset: {e}")
+                messages.error(request, f"System transaction tracking failure: {e}")
         else:
-            messages.error(request, "Asset registration failed: Missing required fields.")
+            messages.error(request, "Failed to execute transaction: Missing required fields.")
         return redirect('inventory_management')
 
-    # Query all inventory items from the database
+    # Query items and full historic timeline transaction sheets
     all_items = Item.objects.all().order_by('name')
+    transaction_logs = InventoryLog.objects.all().order_by('-timestamp')
     
-    # Track metrics for the overview scorecards
     total_items_count = all_items.count()
-    low_stock_threshold = 5
-    low_stock_count = Item.objects.filter(quantity__lte=low_stock_threshold).count()
-    damaged_count = Item.objects.filter(condition='damaged').count()
+    low_stock_count = Item.objects.filter(quantity__lte=5).count()
+    damaged_or_lost_count = Item.objects.filter(condition__in=['damaged', 'lost']).count()
 
     context = {
         'title': '📦 Inventory Stock Registry',
         'all_items': all_items,
+        'transaction_logs': transaction_logs,
         'total_count': total_items_count,
         'low_stock_count': low_stock_count,
-        'damaged_count': damaged_count,
+        'damaged_count': damaged_or_lost_count,
     }
-    
     return render(request, 'inventory/inventory.html', context)
 
+@login_required
+def delete_item(request, item_id):
+    """🗑️ Completely drops a master item tracking entry along with its structural logging fields"""
+    is_write_authorized = (
+        request.user.is_superuser or 
+        request.user.username.lower() == 'admin' or 
+        request.user.has_perm('inventory.delete_item') or
+        request.user.groups.filter(permissions__codename='delete_item').exists()
+    )
+    if not is_write_authorized:
+        messages.error(request, "Access Denied: Your account role limits do not permit item record pruning.")
+        return redirect('inventory_management')
+
+    item = get_object_or_404(Item, id=item_id)
+    name = item.name
+    item.delete()
+    messages.success(request, f"Permanently removed {name} from organizational stock records.")
+    return redirect('inventory_management')
 
 # ==========================================
 # 🖨️ SYSTEM PRINT GENERATION TERMINALS

@@ -1,241 +1,481 @@
 {% extends "admin/base.html" %}
+
 {% load i18n %}
 
+
+
 {% block extrahead %}
+
 {{ block.super }}
+
 <script>
+
     document.documentElement.setAttribute('data-bs-theme', 'dark');
+
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
 {% endblock %}
+
+
 
 {% block extrastyle %}
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
+
     /* Global Page Body Canvas */
-    html, body, #container 
+
+    html, body, #container
+
     {
+
         background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) fixed no-repeat !important;
+
         color: #f8fafc !important;
+
         font-family: 'Plus Jakarta Sans', sans-serif !important;
+
         min-height: 100vh;
+
     }
+
+
 
     /* 1. Neutralize text color flip for all elements under light mode headers */
-    html[data-theme="light"] h1, html[data-theme="light"] h2, 
-    html[data-theme="light"] h3, html[data-theme="light"] h4, 
-    html[data-theme="light"] h5, html[data-theme="light"] p, 
-    html[data-theme="light"] td, html[data-theme="light"] th, 
+
+    html[data-theme="light"] h1, html[data-theme="light"] h2,
+
+    html[data-theme="light"] h3, html[data-theme="light"] h4,
+
+    html[data-theme="light"] h5, html[data-theme="light"] p,
+
+    html[data-theme="light"] td, html[data-theme="light"] th,
+
     html[data-theme="light"] label, html[data-theme="light"] span:not(.badge) {
+
         color: #f8fafc !important;
+
     }
+
+
 
     /* 2. Prevent core container blocks from turning blinding white */
-    html[data-theme="light"] .card, 
+
+    html[data-theme="light"] .card,
+
     html[data-theme="light"] .modal-content,
+
     [data-bs-theme="light"] .card {
+
         background-color: #1e293b !important;
+
         color: #f8fafc !important;
+
         border-color: rgba(255, 255, 255, 0.05) !important;
+
     }
+
+
 
     /* 3. Secure Bootstrap Form Controls and Tables */
-    html[data-theme="light"] input, 
-    html[data-theme="light"] select, 
+
+    html[data-theme="light"] input,
+
+    html[data-theme="light"] select,
+
     html[data-theme="light"] textarea {
+
         background-color: #0f172a !important;
+
         color: #f8fafc !important;
+
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
     }
+
+
 
     html[data-theme="light"] .table {
+
         --bs-table-color: #f8fafc !important;
+
         --bs-table-bg: transparent !important;
+
         --bs-table-striped-color: #f8fafc !important;
+
         --bs-table-striped-bg: rgba(255, 255, 255, 0.02) !important;
+
         border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    /* Neutralize default Django admin structural wrappers to kill the white space gaps */
-    #header {
-        background: transparent !important;
-        border-bottom: none !important;
-        padding: 0 !important;
-        overflow: visible !important;
-    }
-    
-    #content {
-        padding: 0 !important;
+
     }
 
-    .branding, #user-tools, #site-name { 
-        display: none !important; 
+    /* Neutralize default Django admin structural wrappers to kill the white space gaps */
+
+    #header {
+
+        background: transparent !important;
+
+        border-bottom: none !important;
+
+        padding: 0 !important;
+
+        overflow: visible !important;
+
     }
+
+   
+
+    #content {
+
+        padding: 0 !important;
+
+    }
+
+
+
+    .branding, #user-tools, #site-name {
+
+        display: none !important;
+
+    }
+
+
 
     /* 🏛️ The Restored Floating Oval Navbar Component (FIXED LAYERING) */
-    .custom-oval-nav { 
+
+    .custom-oval-nav {
+
         position: relative;         /* 👈 Required for z-index to activate */
+
         z-index: 1060 !important;   /* 👈 Higher than standard layers so it never hides underneath */
-        background: rgba(30, 41, 59, 0.4) !important; 
-        backdrop-filter: blur(12px); 
-        -webkit-backdrop-filter: blur(12px); 
-        border: 1px solid rgba(255, 255, 255, 0.05); 
+
+        background: rgba(30, 41, 59, 0.4) !important;
+
+        backdrop-filter: blur(12px);
+
+        -webkit-backdrop-filter: blur(12px);
+
+        border: 1px solid rgba(255, 255, 255, 0.05);
+
         border-radius: 16px;
+
         padding: 12px 24px !important;
+
         margin-top: 25px;
+
         margin-bottom: 35px;
+
     }
+
+
 
     /* 🚀 Explicitly force dropdown menus to stack cleanly over absolute/glass elements */
+
     .dropdown-menu {
+
         z-index: 1070 !important;   /* 👈 Guarantees options drop downwards seamlessly over everything else */
+
     }
+
+
 
     .navbar-brand-global {
+
         font-weight: 700;
+
         background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+
         -webkit-background-clip: text;
+
         -webkit-text-fill-color: transparent;
+
         text-decoration: none;
+
     }
+
+
 
     .nav-link-global {
+
         color: #94a3b8 !important;
+
         font-weight: 500;
+
         font-size: 0.925rem;
+
         transition: color 0.2s ease, background 0.2s ease;
+
         padding: 6px 14px !important;
+
         border-radius: 8px;
+
     }
+
+
 
     .nav-link-global:hover, .nav-link-global.active {
+
         color: #f8fafc !important;
+
         background: rgba(255, 255, 255, 0.05);
+
     }
-    
+
+   
+
     .nav-link-global.text-info-highlight {
+
         color: #22d3ee !important;
+
     }
+
     .nav-link-global.text-info-highlight:hover {
+
         background: rgba(6, 182, 212, 0.1) !important;
+
     }
+
+
 
     /* Clean right-side utilities */
+
     .logout-btn-global {
+
         background: rgba(239, 68, 68, 0.12) !important;
+
         color: #fca5a5 !important;
+
         border: 1px solid rgba(239, 68, 68, 0.25) !important;
+
         border-radius: 10px;
+
         padding: 6px 14px;
+
         font-size: 0.85rem;
+
         font-weight: 600;
+
         transition: all 0.2s ease;
+
     }
+
+
 
     .logout-btn-global:hover {
+
         background: #ef4444 !important;
+
         color: #ffffff !important;
+
     }
+
 </style>
+
 {% endblock %}
+
+
 
 {% block nav-global %}
+
     {% if user.is_authenticated %}
+
     <div class="container mt-2">
+
         <nav class="navbar navbar-expand-lg navbar-dark custom-oval-nav">
+
             <div class="container-fluid p-0">
+
                 <a class="navbar-brand-global me-4" href="{% url 'dashboard' %}">🏛️ SSLG Portal</a>
-                
+
+               
+
                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sslgGlobalNav">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
-                
+
+               
+
                 <div class="collapse navbar-collapse" id="sslgGlobalNav">
+
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
+
                         <li class="nav-item">
+
                             <a class="nav-link nav-link-global" href="{% url 'dashboard' %}">Dashboard</a>
+
                         </li>
+
                         <li class="nav-item">
+
                             <a class="nav-link nav-link-global" href="{% url 'finance_ledger' %}">Finance</a>
+
                         </li>
+
                         <li class="nav-item">
+
                             <a class="nav-link nav-link-global" href="{% url 'inventory_management' %}">Inventory</a>
+
                         </li>
+
                         <li class="nav-item">
+
                             <a class="nav-link nav-link-global text-info-highlight" href="{% url 'attendance_hub' %}">📸 Attendance Hub</a>
+
                         </li>
+
                         <li class="nav-item">
+
                             <a class="nav-link nav-link-global" href="{% url 'events_calendar' %}">Events</a>
+
                         </li>
+
+
 
                         {% if perms.attendance.print_studentprofile or perms.attendance.print_attendancerecord or perms.events.print_event or perms.finance.print_transaction or perms.inventory.print_item %}
+
                         <li class="nav-item dropdown">
+
                             <a class="nav-link nav-link-global dropdown-toggle" href="#" id="printMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+
                                 🖨️ Print Doc
+
                             </a>
+
                             <ul class="dropdown-menu dropdown-menu-dark border-secondary shadow" aria-labelledby="printMenuLink">
+
                                 <li><h6 class="dropdown-header text-info small uppercase">Documentation Reports</h6></li>
-                                
+
+                               
+
                                 {% if perms.attendance.print_studentprofile %}
+
                                 <li><a class="dropdown-item" href="{% url 'print_student_profiles' %}">📋 Student Profiles</a></li>
+
                                 {% endif %}
-                                
+
+                               
+
                                 {% if perms.attendance.print_attendancerecord %}
+
                                 <li><a class="dropdown-item" href="{% url 'print_attendance_records' %}">⏱️ Attendance Logs</a></li>
+
                                 {% endif %}
+
+
 
                                 {% if perms.events.print_event %}
+
                                 <li><a class="dropdown-item" href="{% url 'print_events_summary' %}">🏛️ Events Report</a></li>
+
                                 {% endif %}
+
+
 
                                 {% if perms.finance.print_transaction %}
+
                                 <li><a class="dropdown-item" href="{% url 'print_finance_ledger' %}">💰 Financial Ledger</a></li>
+
                                 {% endif %}
+
+
 
                                 {% if perms.inventory.print_item %}
+
                                 <li><a class="dropdown-item" href="{% url 'print_inventory' %}">📦 Asset Inventory</a></li>
+
                                 {% endif %}
-                                
+
+                               
+
                                 <li><hr class="dropdown-divider border-secondary"></li>
+
                                 <li>
+
                                     <a class="dropdown-item text-warning" href="#" onclick="window.print(); return false;">
+
                                         📄 Print Current View
+
                                     </a>
+
                                 </li>
+
                             </ul>
+
                         </li>
+
                         {% endif %}
+
                     </ul>
-                    
+
+                   
+
                     <div class="d-flex align-items-center gap-3 ms-auto pt-2 pt-lg-0 border-top border-secondary border-lg-0">
+
                         <span class="text-secondary small">
+
                             Session: <strong class="text-info font-monospace">@{{ user.username }}</strong>
+
                         </span>
+
                         <form action="{% url 'logout' %}" method="post" class="m-0 p-0">
+
                             {% csrf_token %}
+
                             <button type="submit" class="logout-btn-global">Leave Session</button>
+
                         </form>
+
                     </div>
+
                 </div>
+
             </div>
+
         </nav>
+
     </div>
+
     {% endif %}
+
 {% endblock %}
 
+
+
 {% block nav-breadcrumbs %}
+
 <div class="container mb-3">
+
     <div class="breadcrumbs small text-secondary" style="background: transparent; border: none; padding: 0;">
+
         <a href="{% url 'dashboard' %}">{% translate 'Home' %}</a>
+
         {% if title %} &rsaquo; <span class="text-light">{{ title }}</span>{% endif %}
+
     </div>
+
 </div>
+
 {% endblock %}
+
+
 
 {% block content_title %}{% endblock %}
 
+
+
 {% block content %}
+
 <div class="container">
+
     {{ block.super }}
+
 </div>
+
 {% endblock %}

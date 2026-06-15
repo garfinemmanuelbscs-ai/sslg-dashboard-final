@@ -1,294 +1,587 @@
 {% extends "admin/base_site.html" %}
 
+
+
 {% block extrastyle %}
+
 {{ block.super }}
+
 <style>
+
     /* Specific Matrix Dashboard Page Overrides */
-    .matrix-card { 
-        background: rgba(30, 41, 59, 0.4) !important; 
-        backdrop-filter: blur(16px); 
-        border: 1px solid rgba(255, 255, 255, 0.05) !important; 
-        border-radius: 20px; 
+
+    .matrix-card {
+
+        background: rgba(30, 41, 59, 0.4) !important;
+
+        backdrop-filter: blur(16px);
+
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+
+        border-radius: 20px;
+
     }
-    
+
+   
+
     .table { color: #f8fafc !important; vertical-align: middle; }
+
     .table th { border-bottom: 2px solid rgba(255, 255, 255, 0.1) !important; color: #94a3b8 !important; font-size: 0.8rem; letter-spacing: 0.05em; }
-    
+
+   
+
     /* 🚨 THE TRAP-BREAKER OVERRIDE: Protects matrix data cells from light-mode layout washes */
+
     .table tbody tr,
+
     .table tbody td,
+
     html[data-theme="light"] .table tbody tr,
-    html[data-theme="light"] .table tbody td { 
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important; 
+
+    html[data-theme="light"] .table tbody td {
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+
         padding: 12px 10px !important;
+
         background: transparent !important;
+
         background-color: transparent !important;
+
         box-shadow: none !important;
+
         color: #f8fafc !important;
+
     }
-    
-    .form-control-custom, .form-select-custom { 
-        background-color: #0f172a !important; 
-        border: 1px solid rgba(255, 255, 255, 0.1) !important; 
-        color: #f8fafc !important; 
-        border-radius: 10px; 
+
+   
+
+    .form-control-custom, .form-select-custom {
+
+        background-color: #0f172a !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+        color: #f8fafc !important;
+
+        border-radius: 10px;
+
     }
-    .form-control-custom:focus, .form-select-custom:focus { 
-        background-color: #0f172a !important; 
-        color: #f8fafc !important; 
-        border-color: #38bdf8 !important; 
-        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25) !important; 
+
+    .form-control-custom:focus, .form-select-custom:focus {
+
+        background-color: #0f172a !important;
+
+        color: #f8fafc !important;
+
+        border-color: #38bdf8 !important;
+
+        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25) !important;
+
     }
+
     .form-select-custom option { background: #0f172a !important; color: #f8fafc !important; }
-    
-    .perm-scroll-box { 
-        max-height: 180px; 
-        overflow-y: auto; 
-        background: #0f172a !important; 
-        border: 1px solid rgba(255, 255, 255, 0.05) !important; 
-        border-radius: 12px; 
-        padding: 15px; 
+
+   
+
+    .perm-scroll-box {
+
+        max-height: 180px;
+
+        overflow-y: auto;
+
+        background: #0f172a !important;
+
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+
+        border-radius: 12px;
+
+        padding: 15px;
+
     }
+
     .btn-custom-action { background: rgba(56, 189, 248, 0.15) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; border-radius: 10px; font-weight: 600; }
+
     .btn-custom-action:hover { background: #38bdf8 !important; color: #0f172a !important; }
-    
+
+   
+
     /* Modal Styles */
-    .sslg-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8) !important; backdrop-filter: blur(5px); z-index: 2000 !important; justify-content: center; align-items: center; }
+
+    .sslg-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.😎 !important; backdrop-filter: blur(5px); z-index: 2000 !important; justify-content: center; align-items: center; }
+
     .sslg-modal-content { background: #1e293b !important; padding: 25px; border-radius: 16px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #f8fafc !important; }
+
     .permissions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 15px 0; }
+
     .role-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); gap: 10px; }
+
     .action-buttons { display: flex; gap: 5px; }
+
 </style>
+
 {% endblock %}
+
+
 
 {% block content %}
+
 <div class="container-fluid mt-2 px-0" data-bs-theme="dark">
+
     <div class="mb-4">
+
         <h1 class="text-white mb-1" style="font-weight: 700;">⚙️ Access Authorization Matrix</h1>
+
         <p class="text-white-50 m-0" style="color: #94a3b8 !important;">Initialize staff identities, construct structural permission groups, map application flags, and assign system assets.</p>
+
     </div>
+
+
 
     {% if messages %}
+
         {% for message in messages %}
+
             <div class="alert {% if message.tags == 'error' %}alert-danger border-danger text-danger{% else %}alert-success border-success text-success{% endif %} bg-dark alert-dismissible fade show rounded-4 mb-4" role="alert">
+
                 ✨ {{ message }}
+
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+
             </div>
+
         {% endfor %}
+
     {% endif %}
 
+
+
     <div class="row g-4">
+
         <div class="col-lg-4">
+
             <div class="d-flex flex-column gap-4">
-                
-                <div class="card matrix-card p-4">
-                    <h5 class="text-white mb-3">👤 Identity Registration Engine</h5>
-                    <form action="{% url 'create_user' %}" method="POST">
-                        {% csrf_token %}
-                        <div class="mb-2">
-                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">SYSTEM USERNAME</label>
-                            <input type="text" name="username" placeholder="e.g., sglc_admin" class="form-control form-control-custom form-control-sm" required>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-5">
-                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">FIRST NAME</label>
-                                <input type="text" name="first_name" placeholder="John" class="form-control form-control-custom form-control-sm" required>
-                            </div>
-                            <div class="col-5">
-                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">LAST NAME</label>
-                                <input type="text" name="last_name" placeholder="Doe" class="form-control form-control-custom form-control-sm" required>
-                            </div>
-                            <div class="col-2">
-                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">M.I.</label>
-                                <input type="text" name="mi" placeholder="E" maxlength="2" class="form-control form-control-custom form-control-sm">
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">PASSWORD ENTRY</label>
-                            <input type="password" name="password" placeholder="••••••••" class="form-control form-control-custom form-control-sm" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">VERIFY PASSWORD</label>
-                            <input type="password" name="re_password" placeholder="••••••••" class="form-control form-control-custom form-control-sm" required>
-                        </div>
-                        <button type="submit" class="btn btn-custom-action btn-sm w-100 py-2">Provision Identity Node</button>
-                    </form>
-                </div>
+
+               
 
                 <div class="card matrix-card p-4">
-                    <h5 class="text-white mb-3">🛠️ Group Permission Builder</h5>
-                    <form action="{% url 'manage_roles' %}" method="POST">
+
+                    <h5 class="text-white mb-3">👤 Identity Registration Engine</h5>
+
+                    <form action="{% url 'create_user' %}" method="POST">
+
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">GROUP / ROLE NAME</label>
-                            <input type="text" name="group_name" placeholder="e.g., Finance Committee" class="form-control form-control-custom form-control-sm" required>
+
+                        <div class="mb-2">
+
+                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">SYSTEM USERNAME</label>
+
+                            <input type="text" name="username" placeholder="e.g., sglc_admin" class="form-control form-control-custom form-control-sm" required>
+
                         </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">SELECT SYSTEM PERMISSIONS</label>
-                            <div class="perm-scroll-box">
-                                {% for perm in sslg_permissions %}
-                                    <div class="form-check mb-2">
-                                        <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}" id="perm_{{ perm.id }}">
-                                        <label class="form-check-label small text-light" for="perm_{{ perm.id }}">
-                                            <span class="text-info font-monospace">[{{ perm.content_type.app_label }}]</span> {{ perm.name }}
-                                        </label>
-                                    </div>
-                                {% endfor %}
+
+                        <div class="row g-2 mb-2">
+
+                            <div class="col-5">
+
+                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">FIRST NAME</label>
+
+                                <input type="text" name="first_name" placeholder="John" class="form-control form-control-custom form-control-sm" required>
+
                             </div>
+
+                            <div class="col-5">
+
+                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">LAST NAME</label>
+
+                                <input type="text" name="last_name" placeholder="Doe" class="form-control form-control-custom form-control-sm" required>
+
+                            </div>
+
+                            <div class="col-2">
+
+                                <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">M.I.</label>
+
+                                <input type="text" name="mi" placeholder="E" maxlength="2" class="form-control form-control-custom form-control-sm">
+
+                            </div>
+
                         </div>
-                        <input type="hidden" name="permissions" value="-1">
-                        <button type="submit" class="btn btn-custom-action btn-sm w-100 py-2">Save Group Structure</button>
+
+                        <div class="mb-2">
+
+                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">PASSWORD ENTRY</label>
+
+                            <input type="password" name="password" placeholder="••••••••" class="form-control form-control-custom form-control-sm" required>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label text-white-50 small fw-bold mb-1" style="color: #94a3b8 !important;">VERIFY PASSWORD</label>
+
+                            <input type="password" name="re_password" placeholder="••••••••" class="form-control form-control-custom form-control-sm" required>
+
+                        </div>
+
+                        <button type="submit" class="btn btn-custom-action btn-sm w-100 py-2">Provision Identity Node</button>
+
                     </form>
+
+                </div>
+
+
+
+                <div class="card matrix-card p-4">
+
+                    <h5 class="text-white mb-3">🛠️ Group Permission Builder</h5>
+
+                    <form action="{% url 'manage_roles' %}" method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">GROUP / ROLE NAME</label>
+
+                            <input type="text" name="group_name" placeholder="e.g., Finance Committee" class="form-control form-control-custom form-control-sm" required>
+
+                        </div>
+
+                       
+
+                        <div class="mb-4">
+
+                            <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">SELECT SYSTEM PERMISSIONS</label>
+
+                            <div class="perm-scroll-box">
+
+                                {% for perm in sslg_permissions %}
+
+                                    <div class="form-check mb-2">
+
+                                        <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}" id="perm_{{ perm.id }}">
+
+                                        <label class="form-check-label small text-light" for="perm_{{ perm.id }}">
+
+                                            <span class="text-info font-monospace">[{{ perm.content_type.app_label }}]</span> {{ perm.name }}
+
+                                        </label>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                        <input type="hidden" name="permissions" value="-1">
+
+                        <button type="submit" class="btn btn-custom-action btn-sm w-100 py-2">Save Group Structure</button>
+
+                    </form>
+
+
 
                     <hr class="border-secondary my-3">
+
                     <h6 class="text-white-50 small fw-bold mb-2" style="color: #94a3b8 !important;">CURRENT ACTIVE GROUPS & CONTROLS</h6>
-                    
+
+                   
+
                     {% for group in groups %}
+
                     <div class="role-row py-1">
+
                         <form action="{% url 'edit_group' group.id %}" method="POST" style="display: flex; gap: 5px; align-items: center; flex-grow: 1;">
+
                             {% csrf_token %}
+
                             <input type="text" name="group_name" value="{{ group.name }}" required class="form-control form-control-custom form-control-sm" style="max-width: 140px;">
+
                             {% for perm in group.permissions.all %}
+
                                 <input type="hidden" name="permissions" value="{{ perm.id }}">
+
                             {% endfor %}
-                            <input type="hidden" name="permissions" value="-1"> 
+
+                            <input type="hidden" name="permissions" value="-1">
+
                             <button type="submit" class="btn btn-sm btn-outline-info px-2 py-0" style="font-size: 0.75rem;">Save</button>
+
                         </form>
 
+
+
                         <div class="action-buttons">
+
                             <button type="button" class="btn btn-sm btn-outline-warning px-2 py-0" style="font-size: 0.75rem;" onclick="openModal('modal-{{ group.id }}')">Perms</button>
+
                             <form action="{% url 'delete_group' group.id %}" method="POST" onsubmit="return confirm('Delete role {{ group.name }}?');">
+
                                 {% csrf_token %}
+
                                 <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-0" style="font-size: 0.75rem;">Delete</button>
+
                             </form>
+
                         </div>
+
+
 
                         <div id="modal-{{ group.id }}" class="sslg-modal-overlay">
+
                             <div class="sslg-modal-content">
+
                                 <h4 class="mb-4">Edit Permissions for: <strong class="text-info">{{ group.name }}</strong></h4>
+
                                 <form action="{% url 'edit_group' group.id %}" method="POST">
+
                                     {% csrf_token %}
+
                                     <input type="hidden" name="group_name" value="{{ group.name }}">
+
                                     <div class="permissions-grid">
+
                                         {% for perm in sslg_permissions %}
+
                                         <div class="form-check text-start">
+
                                             <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm.id }}" id="m_{{ group.id }}_{{ perm.id }}"
+
                                                 {% if perm in group.permissions.all %}checked{% endif %}>
+
                                             <label class="form-check-label small text-white" for="m_{{ group.id }}_{{ perm.id }}">
+
                                                 <span class="text-info font-monospace">[{{ perm.content_type.app_label }}]</span> {{ perm.name }}
+
                                             </label>
+
                                         </div>
+
                                         {% endfor %}
+
                                     </div>
+
                                     <input type="hidden" name="permissions" value="-1">
+
                                     <div class="d-flex justify-content-end gap-2 mt-4">
+
                                         <button type="button" class="btn btn-secondary" onclick="closeModal('modal-{{ group.id }}')">Cancel</button>
+
                                         <button type="submit" class="btn btn-info text-dark fw-bold">Save Changes</button>
+
                                     </div>
+
                                 </form>
+
                             </div>
+
                         </div>
+
                     </div>
+
                     {% empty %}
+
                         <p class="text-white-50 small py-1">No operational groups built.</p>
+
                     {% endfor %}
+
                 </div>
+
             </div>
+
         </div>
+
+
 
         <div class="col-lg-8">
+
             <div class="card matrix-card p-4 h-100">
+
                 <h5 class="text-white mb-3">👥 Member Group Allocation & Account Matrix</h5>
+
                 <div class="table-responsive">
+
                     <table class="table table-dark table-hover m-0 bg-transparent">
+
                         <thead>
+
                             <tr>
+
                                 <th>MEMBER LOG</th>
+
                                 <th>LEGAL FULL NAME</th>
+
                                 <th>INHERITED GROUPS</th>
+
                                 <th class="text-end">ACTIONS & CONTROL STRATEGIES</th>
+
                             </tr>
+
                         </thead>
+
                         <tbody>
+
                             {% for user in users %}
+
                             <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+
                                 <td class="fw-bold text-white" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+
                                     <span class="text-info font-monospace">@{{ user.username }}</span>
+
                                 </td>
+
                                 <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+
                                     <span class="text-light fw-semibold">{{ user.last_name }}, {{ user.first_name }}</span>
+
                                     {% if user.studentprofile.middle_initial %}
+
                                         <small class="text-white-50 font-monospace">{{ user.studentprofile.middle_initial }}.</small>
+
                                     {% endif %}
+
                                 </td>
+
                                 <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+
                                     {% for group in user.groups.all %}
+
                                         <span class="badge bg-info text-dark rounded-pill me-1" style="font-weight: 600;">{{ group.name }}</span>
+
                                     {% empty %}
+
                                         <span class="text-white-50 small" style="color: #64748b !important;">Standard Base Access</span>
+
                                     {% endfor %}
+
                                 </td>
+
                                 <td class="text-end" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+
                                     <div class="d-flex justify-content-end align-items-center gap-2">
-                                        
+
+                                       
+
                                         <form action="{% url 'assign_user_role' %}" method="POST" class="d-flex align-items-center gap-1">
+
                                             {% csrf_token %}
+
                                             <input type="hidden" name="user_id" value="{{ user.id }}">
+
                                             <select name="group_id" class="form-select form-select-sm form-select-custom w-auto py-0 px-2" style="font-size: 0.8rem; height: 26px;">
+
                                                 <option value="">-- Clear --</option>
+
                                                 {% for group in groups %}
+
                                                     <option value="{{ group.id }}" {% if group in user.groups.all %}selected{% endif %}>{{ group.name }}</option>
+
                                                 {% endfor %}
+
                                             </select>
+
                                             <button type="submit" class="btn btn-sm btn-custom-action py-0 px-2" style="font-size: 0.75rem; height: 26px;">Grant</button>
+
                                         </form>
+
+
 
                                         <button type="button" class="btn btn-sm btn-outline-warning py-0 px-2" style="font-size: 0.75rem; height: 26px;" onclick="openModal('pass-{{ user.id }}')">Password</button>
-                                        
+
+                                       
+
                                         {% if user.username != 'admin' %}
+
                                         <form action="{% url 'delete_user' user.id %}" method="POST" onsubmit="return confirm('Purge user network node account: @{{ user.username }}?');" class="m-0">
+
                                             {% csrf_token %}
+
                                             <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 0.75rem; height: 26px;">Delete</button>
+
                                         </form>
+
                                         {% endif %}
+
                                     </div>
+
+
 
                                     <div id="pass-{{ user.id }}" class="sslg-modal-overlay">
+
                                         <div class="sslg-modal-content text-start">
+
                                             <h5 class="mb-3">Update Identity Security Keys: <span class="text-warning">@{{ user.username }}</span></h5>
+
                                             <form action="{% url 'change_user_password' user.id %}" method="POST">
+
                                                 {% csrf_token %}
+
                                                 <div class="mb-2">
+
                                                     <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">NEW ACCESS KEY VALUE</label>
+
                                                     <input type="password" name="password" placeholder="••••••••" class="form-control form-control-custom" required>
+
                                                 </div>
+
                                                 <div class="mb-3">
+
                                                     <label class="form-label text-white-50 small fw-bold" style="color: #94a3b8 !important;">RE-ENTER TO VALIDATE</label>
+
                                                     <input type="password" name="re_password" placeholder="••••••••" class="form-control form-control-custom" required>
+
                                                 </div>
+
                                                 <div class="d-flex justify-content-end gap-2">
+
                                                     <button type="button" class="btn btn-sm btn-secondary" onclick="closeModal('pass-{{ user.id }}')">Cancel</button>
+
                                                     <button type="submit" class="btn btn-sm btn-warning text-dark fw-bold">Rewrite Credentials</button>
+
                                                 </div>
+
                                             </form>
+
                                         </div>
+
                                     </div>
 
+
+
                                 </td>
+
                             </tr>
+
                             {% endfor %}
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
+
+
 <script>
+
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
     window.onclick = function(e) { if (e.target.classList.contains('sslg-modal-overlay')) e.target.style.display = "none"; }
+
 </script>
-{% endblock %}
+
+{% endblock %} 

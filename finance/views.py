@@ -131,3 +131,32 @@ def print_finance_ledger(request):
         'balance': f"{actual_balance:,.2f}", 
     }
     return render(request, 'finance/print_ledger.html', context)
+
+
+
+@login_required
+def delete_transaction(request, transaction_id):
+    """🗑️ Securely removes a financial transaction log entry"""
+    # 🛡️ Reuse your existing write authority rule
+    is_write_authorized = (
+        request.user.is_superuser or 
+        request.user.username.lower() == 'admin' or 
+        request.user.has_perm('finance.delete_transaction') or
+        request.user.groups.filter(permissions__codename='delete_transaction').exists()
+    )
+    
+    if not is_write_authorized:
+        messages.error(request, "Access Denied: You lack explicit privileges to remove finance logs.")
+        return redirect('finance_ledger')
+        
+    try:
+        transaction = Transaction.objects.get(id=transaction_id)
+        source_name = transaction.source
+        transaction.delete()
+        messages.success(request, f"Successfully removed transaction entry: {source_name}!")
+    except Transaction.DoesNotExist:
+        messages.error(request, "Transaction entry not found or already deleted.")
+    except Exception as e:
+        messages.error(request, f"Error removing transaction entry: {e}")
+        
+    return redirect('finance_ledger')

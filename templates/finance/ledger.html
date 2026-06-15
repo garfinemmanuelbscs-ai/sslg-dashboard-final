@@ -77,7 +77,10 @@
             <h1 class="fw-bold m-0 text-white">{{ title|default:"Finance Ledger" }}</h1>
             <p class="text-secondary m-0">Complete balance sheets and institutional transaction lines.</p>
         </div>
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'print_finance_ledger' %}" target="_blank" class="btn btn-outline-info rounded-pill px-4">🖨️ Print Document</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+        </div>
     </div>
 
     <div class="row g-4 mb-4">
@@ -135,8 +138,7 @@
                                 <th>Description / Source</th>
                                 <th>Type</th>
                                 <th>Amount</th>
-                                <th>Date Passed</th>
-                            </tr>
+                                <th>Date & Time Passed</th> <th>Officer</th>            <th class="text-end">Actions</th> </tr>
                         </thead>
                         <tbody>
                             {% for t in transactions %}
@@ -149,12 +151,26 @@
                                 </td>
                                 <td class="fw-bold {% if t.type == 'income' %}text-success{% else %}text-danger{% endif %}" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     ₱{{ t.amount }}
+                                tap_matrix_end
+                                <td class="text-secondary small" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                    {{ t.date|date:"M. d, Y h:i A" }}
                                 </td>
-                                <td class="text-secondary small" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">{{ t.date }}</td>
+                                
+                                <td class="text-info small" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                    👤 {% if t.officer.get_full_name %}{{ t.officer.get_full_name }}{% else %}{{ t.officer.username }}{% endif %}
+                                </td>
+                                
+                                <td class="text-end" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                    <a href="{% url 'delete_transaction' t.id %}" 
+                                       class="btn btn-sm btn-link text-danger text-decoration-none p-0 px-2 fw-semibold" 
+                                       onclick="return confirm('Are you sure you want to permanently delete this financial record from the institutional ledger?');">
+                                        Remove
+                                    </a>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
-                                <td colspan="4" class="text-center text-muted py-5" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                                <td colspan="6" class="text-center text-muted py-5" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
                                     📭 Financial ledger database is clean. No records found.
                                 </td>
                             </tr>

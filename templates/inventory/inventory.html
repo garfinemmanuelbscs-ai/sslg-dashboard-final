@@ -22,14 +22,34 @@
         border-bottom: 2px solid rgba(255,255,255,0.05); 
     }
     
+    .table tbody tr, .table tbody td {
+        background: transparent !important; 
+        background-color: transparent !important;
+        box-shadow: none !important; 
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important; 
+        vertical-align: middle;
+    }
+    
     .badge-alert { background: rgba(239, 68, 68, 0.2) !important; color: #fca5a5 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
     .badge-ok { background: rgba(16, 185, 129, 0.2) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+    .badge-empty { background: rgba(239, 68, 68, 0.4) !important; color: #ef4444 !important; border: 1px solid rgba(239, 68, 68, 0.5) !important; }
+
+    /* Transaction Type Badges */
+    .badge-add { background: rgba(56, 189, 248, 0.2) !important; color: #38bdf8 !important; border: 1px solid rgba(56, 189, 248, 0.3) !important; }
+    .badge-borrow { background: rgba(168, 85, 247, 0.2) !important; color: #c084fc !important; border: 1px solid rgba(168, 85, 247, 0.3) !important; }
+    .badge-lost { background: rgba(244, 63, 94, 0.2) !important; color: #fb7185 !important; border: 1px solid rgba(244, 63, 94, 0.3) !important; }
     
-    .form-control, .form-select { 
+    .form-control, .form-select, .form-textarea { 
         background-color: rgba(15, 23, 42, 0.6) !important; 
         border: 1px solid rgba(255, 255, 255, 0.1) !important; 
         color: #fff !important; 
         border-radius: 10px; 
+    }
+    .form-control:focus, .form-select:focus, .form-textarea:focus {
+        background-color: rgba(15, 23, 42, 0.8) !important;
+        border-color: #38bdf8 !important;
+        color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25) !important;
     }
     .form-select option { background: #1e293b; color: #fff; }
 </style>
@@ -43,7 +63,10 @@
             <h1 class="fw-bold m-0 text-white">📦 Supply Inventory</h1>
             <p class="text-secondary m-0">Real-time resource audits and critical restock levels.</p>
         </div>
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'print_inventory' %}" target="_blank" class="btn btn-outline-info rounded-pill px-4">🖨️ Print Inventory</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4 text-light">← Back</a>
+        </div>
     </div>
 
     {% if messages %}
@@ -55,43 +78,55 @@
         {% endfor %}
     {% endif %}
 
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="glass-panel text-center"><h5 class="text-white-50 small mb-2">Unique Registered Items</h5><h3 class="text-info fw-bold">{{ total_count }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5 class="text-white-50 small mb-2">Low Stock Items (≤5)</h5><h3 class="text-warning fw-bold">{{ low_stock_count }}</h3></div></div>
+        <div class="col-md-4"><div class="glass-panel text-center"><h5 class="text-white-50 small mb-2">Damaged / Lost Indicators</h5><h3 class="text-danger fw-bold">{{ damaged_count }}</h3></div></div>
+    </div>
+
     <div class="row g-4">
         {% if perms.inventory.add_item or user.is_superuser %}
         <div class="col-lg-4">
             <div class="glass-panel">
-                <h5 class="fw-bold text-white mb-3">Add Stock Resource</h5>
-                <form method="POST">
+                <h5 class="fw-bold text-white mb-3">✨ Adjust Stock Levels / Actions</h5>
+                <form method="POST" action="{% url 'inventory_management' %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label class="small text-secondary mb-1">Item Name</label>
                         <input type="text" name="name" class="form-control" required placeholder="e.g., A4 Bond Paper">
                     </div>
                     <div class="mb-3">
-                        <label class="small text-secondary mb-1">Quantity</label>
-                        <input type="number" name="quantity" class="form-control" required placeholder="0">
-                    </div>
-                    <div class="mb-3">
-                        <label class="small text-secondary mb-1">Item Condition</label>
-                        <select name="condition" class="form-select" required>
-                            <option value="good">Good</option>
-                            <option value="damaged">Damaged</option>
-                            <option value="lost">Lost</option>
+                        <label class="small text-secondary mb-1">Action Type</label>
+                        <select name="action_type" class="form-select" required>
+                            <option value="" disabled selected hidden>Select operation classification...</option>
+                            <option value="add">Add Stock (+)</option>
+                            <option value="borrow">Borrow Item (-)</option>
+                            <option value="lost">Report Lost (-)</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="small text-secondary mb-1">Accountable Custodian</label>
-                        <input type="text" name="custodian" class="form-control" required placeholder="Name of officer">
+                        <label class="small text-secondary mb-1">Quantity (Units)</label>
+                        <input type="number" name="quantity" min="1" class="form-control" required placeholder="1">
                     </div>
-                    <button type="submit" class="btn btn-warning w-100 fw-bold rounded-3 text-dark mt-2">Add New Item</button>
+                    <div class="mb-3">
+                        <label class="small text-secondary mb-1">Accountable Custodian / Sub-department</label>
+                        <input type="text" name="custodian" class="form-control" placeholder="e.g., Council Secretariat">
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-secondary mb-1">Audit Tracking Remarks</label>
+                        <textarea name="remarks" class="form-control form-textarea" rows="2" placeholder="Provide context regarding this entry..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 fw-bold rounded-3 text-dark mt-2">Submit Log Entry</button>
                 </form>
             </div>
         </div>
         {% endif %}
 
-        <div class="{% if perms.inventory.add_item or user.is_superuser %}col-lg-8{% else %}col-12{% endif %}">
+        <div class="{% if perms.inventory.add_item or user.is_superuser %}col-lg-8{% else %}col-12{% endif %} d-flex flex-column gap-4">
+            
             <div class="glass-panel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-white m-0">📜 Stock Records</h5>
+                    <h5 class="fw-bold text-white m-0">📦 Master Inventory Quantities</h5>
                     {% if not perms.inventory.add_item and not user.is_superuser %}
                         <span class="badge bg-secondary text-wrap rounded-pill px-3 py-2">👁️ Read-Only Session</span>
                     {% endif %}
@@ -104,28 +139,36 @@
                                 <th>Item Name</th>
                                 <th>In-Stock Quantity</th>
                                 <th>Status</th>
+                                <th>Last Custodian</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for item in all_items %}
-                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
-                                <td class="fw-medium" style="color: #e2e8f0 !important; background: transparent !important; background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
-                                    {{ item.name }}
-                                  </td>
-                                <td class="fw-bold" style="color: #ffffff !important; background: transparent !important; background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
-                                    {{ item.quantity }}
-                                </td>
-                                <td style="background: transparent !important; background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255,255,255,0.05) !important;">
-                                    {% if item.quantity < 5 %}
+                            <tr>
+                                <td class="fw-medium" style="color: #e2e8f0 !important;">{{ item.name }}</td>
+                                <td class="fw-bold" style="color: #ffffff !important;">{{ item.quantity }} units</td>
+                                <td>
+                                    {% if item.quantity == 0 %}
+                                        <span class="badge badge-empty">🛑 OUT OF STOCK</span>
+                                    {% elif item.quantity <= 5 %}
                                         <span class="badge badge-alert">⚠️ LOW STOCK</span>
                                     {% else %}
                                         <span class="badge badge-ok">✓ AVAILABLE</span>
                                     {% endif %}
                                 </td>
+                                <td class="text-secondary small">{{ item.custodian|default:"Unassigned" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'delete_item' item.id %}" 
+                                       class="text-danger text-decoration-none small fw-semibold px-2" 
+                                       onclick="return confirm('Are you sure you want to completely erase this item from master records? All transaction logs associated will drop.');">
+                                        Remove
+                                    </a>
+                                </td>
                             </tr>
                             {% empty %}
-                            <tr style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
-                                <td colspan="3" class="text-center text-muted py-5" style="background: transparent !important; background-color: transparent !important; box-shadow: none !important;">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
                                     📭 No inventory items found in the database directory.
                                 </td>
                             </tr>
@@ -134,6 +177,47 @@
                     </table>
                 </div>
             </div>
+
+            <div class="glass-panel">
+                <h5 class="fw-bold text-white mb-3">📜 Real-Time Audit Transaction Log Sheets</h5>
+                <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                    <table class="table m-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Item Asset</th>
+                                <th>Operation</th>
+                                <th>Qty</th>
+                                <th>Officer In Charge</th>
+                                <th>Tracking Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in transaction_logs %}
+                            <tr>
+                                <td class="text-secondary small">{{ log.timestamp|date:"M d, Y h:i A" }}</td>
+                                <td class="fw-semibold text-light">{{ log.item.name }}</td>
+                                <td>
+                                    <span class="badge px-2 py-1 {% if log.action_type == 'add' %}badge-add{% elif log.action_type == 'borrow' %}badge-borrow{% else %}badge-lost{% endif %}">
+                                        {{ log.get_action_type_display|upper }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold text-white">{{ log.quantity }}</td>
+                                <td class="text-info small">👤 {{ log.officer.username }}</td>
+                                <td class="text-muted small text-wrap" style="max-width: 180px;">{{ log.remarks|default:"--" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    No historical ledger steps recorded inside this app module yet.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

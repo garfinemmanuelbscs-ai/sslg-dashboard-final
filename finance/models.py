@@ -8,18 +8,18 @@ class Transaction(models.Model):
         max_length=10,
         choices=[('income', 'Income'), ('expense', 'Expense')]
     )
-    date = models.DateField(auto_now_add=True)
+    # 🕒 FIX: Changed from DateField to DateTimeField to capture exact time!
+    date = models.DateTimeField(auto_now_add=True)
     officer = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.source} - {self.type} - {self.amount}"
 
     class Meta:
-        app_label = 'finance'              # <-- forces Django to show Finance
+        app_label = 'finance'
         verbose_name = "Transaction"
         verbose_name_plural = "Transactions"
-        default_permissions = ('add', 'view')  # 🛑 Permanently locks out change & delete permissions
-        # 🖨️ Explicit custom print permission registration
+        # 🔓 FIX: Removed the restrictive default_permissions so delete works!
         permissions = [
             ("print_transaction", "Can print financial ledger registry indices"),
         ]

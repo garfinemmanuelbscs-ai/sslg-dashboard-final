@@ -1,162 +1,324 @@
 {% extends "admin/base_site.html" %}
 
+
+
 {% block extrastyle %}
+
 {{ block.super }}
+
 <style>
+
     /* Responsive Canvas Container Guard */
+
     .dashboard-wrapper {
+
         max-width: 1300px;
+
         margin: 0 auto;
+
     }
+
+
 
     /* Metric Card Component Architectures */
-    .metric-card { 
-        background: rgba(30, 41, 59, 0.4); 
-        backdrop-filter: blur(16px); 
+
+    .metric-card {
+
+        background: rgba(30, 41, 59, 0.4);
+
+        backdrop-filter: blur(16px);
+
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.05); 
-        border-radius: 20px; 
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        height: 100%; 
+
+        border: 1px solid rgba(255, 255, 255, 0.05);
+
+        border-radius: 20px;
+
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        height: 100%;
+
         display: flex;
+
         flex-direction: column;
+
     }
-    .metric-card:hover { 
-        transform: translateY(-5px); 
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); 
+
+    .metric-card:hover {
+
+        transform: translateY(-5px);
+
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+
         border-color: rgba(255, 255, 255, 0.1);
+
     }
-    
+
+   
+
     /* Top Accent System Anchors */
+
     .accent-finance { border-top: 4px solid #10b981; }
+
     .accent-inventory { border-top: 4px solid #f59e0b; }
+
     .accent-attendance { border-top: 4px solid #06b6d4; }
+
     .accent-events { border-top: 4px solid #6366f1; }
-    
+
+   
+
     /* Dashboard Internal Utility Elements */
-    .btn-custom { 
-        border-radius: 12px; 
-        padding: 10px 16px; 
-        font-weight: 600; 
-        font-size: 0.875rem; 
-        transition: all 0.2s ease; 
-        text-decoration: none; 
-        display: block; 
+
+    .btn-custom {
+
+        border-radius: 12px;
+
+        padding: 10px 16px;
+
+        font-weight: 600;
+
+        font-size: 0.875rem;
+
+        transition: all 0.2s ease;
+
+        text-decoration: none;
+
+        display: block;
+
     }
+
     .btn-finance { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+
     .btn-finance:hover { background-color: #10b981; color: #fff; }
-    
+
+   
+
     .btn-inventory { background-color: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
     .btn-inventory:hover { background-color: #f59e0b; color: #fff; }
-    
+
+   
+
     .btn-attendance { background-color: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+
     .btn-attendance:hover { background-color: #06b6d4; color: #fff; }
-    
+
+   
+
     .btn-events { background-color: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+
     .btn-events:hover { background-color: #6366f1; color: #fff; }
-    
+
+   
+
     .card-list { list-style: none; padding-left: 0; margin-bottom: 20px; }
+
     .card-list li { padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.925rem; }
+
     .badge-alert { background-color: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
 
+
+
     /* Dynamic Typography Scaling for Small Displays */
+
     @media (max-width: 576px) {
+
         .dashboard-header h1 { font-size: 1.75rem !important; }
+
         .dashboard-header p { font-size: 0.9rem !important; }
+
     }
+
 </style>
+
 {% endblock %}
+
+
 
 {% block content %}
+
 <div class="container-fluid mt-2 px-0 dashboard-wrapper">
-    
+
+   
+
     <div class="mb-5 d-flex justify-content-between align-items-center flex-wrap gap-3 dashboard-header">
+
         <div>
+
             <h1 class="text-white mb-1" style="font-weight: 700;">📊 Student Government Dashboard</h1>
+
             <p class="text-secondary m-0">Real-time operations, analytics, and biometric attendance records tracking.</p>
+
         </div>
-        
+
+       
+
         {% if request.user.is_superuser or request.user.username|lower == "admin" %}
+
         <div>
+
             <a href="{% url 'manage_roles' %}" class="btn btn-outline-warning rounded-pill px-4 btn-sm fw-bold w-100 text-nowrap">
+
                 ⚙️ Access Authorization Matrix
+
             </a>
+
         </div>
+
         {% endif %}
+
     </div>
+
+
 
     <div class="row g-4">
+
         <div class="col-12 col-sm-6">
+
             <div class="card metric-card accent-finance p-4">
+
                 <div class="card-body p-0 d-flex flex-column h-100 justify-content-between">
+
                     <div>
+
                         <h5 class="text-white-50 fs-6 mb-3">💰 FINANCE OVERVIEW</h5>
+
                         <p class="text-secondary small mb-1">Current Account Balance</p>
+
                         <h2 class="fw-bold text-success mb-4">₱{{ balance }}</h2>
+
                     </div>
+
                     <a href="{% url 'finance_ledger' %}" class="btn-custom btn-finance text-center mt-4">View Ledger Transactions</a>
+
                 </div>
+
             </div>
+
         </div>
 
+
+
         <div class="col-12 col-sm-6">
+
             <div class="card metric-card accent-inventory p-4">
+
                 <div class="card-body p-0 d-flex flex-column h-100 justify-content-between">
+
                     <div>
+
                         <h5 class="text-white-50 mb-3 fs-6">📦 INVENTORY ALERTS</h5>
+
                         {% if low_stock_items %}
+
                             <ul class="card-list">
+
                                 {% for item in low_stock_items %}
+
                                     <li class="d-flex justify-content-between align-items-center py-2">
+
                                         <span class="text-light">{{ item.name }}</span>
+
                                         <span class="badge badge-alert">Only {{ item.quantity }} left</span>
+
                                     </li>
+
                                 {% endfor %}
+
                             </ul>
+
                         {% else %}
+
                             <p class="text-secondary small my-4">All stock supplies are verified and sufficiently filled.</p>
+
                         {% endif %}
+
                     </div>
+
                     <a href="{% url 'inventory_management' %}" class="btn-custom btn-inventory text-center mt-4">Manage Stock Items</a>
+
                 </div>
+
             </div>
+
         </div>
 
+
+
         <div class="col-12 col-sm-6">
+
             <div class="card metric-card accent-attendance p-4">
+
                 <div class="card-body p-0 d-flex flex-column h-100 justify-content-between">
+
                     <div>
+
                         <h5 class="text-white-50 mb-3 fs-6">📋 RECOGNITION ATTENDANCE</h5>
+
                         <p class="text-secondary small mb-1">Total Absences Logged Today</p>
+
                         <h3 class="fw-bold text-info mb-4">{{ absences }} <span class="fs-6 text-muted font-sans">records flagged</span></h3>
+
                     </div>
+
                     <a href="{% url 'attendance_hub' %}" class="btn-custom btn-attendance text-center mt-4">⏱️ Enter Hub</a>
+
                 </div>
+
             </div>
+
         </div>
 
+
+
         <div class="col-12 col-sm-6">
+
             <div class="card metric-card accent-events p-4">
+
                 <div class="card-body p-0 d-flex flex-column h-100 justify-content-between">
+
                     <div>
+
                         <h5 class="text-white-50 mb-3 fs-6">📅 UPCOMING EVENTS</h5>
+
                         {% if upcoming_events %}
+
                             <ul class="card-list">
+
                                 {% for event in upcoming_events %}
+
                                     <li class="d-flex justify-content-between align-items-center py-1">
+
                                         <span class="text-light fw-medium text-truncate me-2">{{ event.title }}</span>
+
                                         <span class="text-muted small flex-shrink-0">{{ event.date }}</span>
+
                                     </li>
+
                                 {% endfor %}
+
                             </ul>
+
                         {% else %}
+
                             <p class="text-secondary small my-4">No campus operations currently scheduled.</p>
+
                         {% endif %}
+
                     </div>
+
                     <a href="{% url 'events_calendar' %}" class="btn-custom btn-events text-center mt-4">Open Events Calendar</a>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
-{% endblock %}
+
+{% endblock %} 
+
